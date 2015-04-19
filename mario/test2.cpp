@@ -144,7 +144,6 @@ bool LTexture::loadFromFile( std::string path, std::string color )
 			SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0xFF, 0xFF, 0xFF ) );
 		}
 		else if (color == "green") {
-			cout << "color is " << color << endl;
 			SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0xA4, 0xE0, 0xA0 ) );
 		}
 		//Create texture from surface pixels
@@ -449,7 +448,7 @@ void close()
 	SDL_Quit();
 }
 
-bool isBrick(int xloc, int yloc)
+bool isBrick_down(int xloc, int yloc)
 {
 	int x_coord = xloc/BRICK_HEIGHT;
 	int x_remainder = xloc % BRICK_HEIGHT;
@@ -468,6 +467,51 @@ bool isBrick(int xloc, int yloc)
 	}
 	return false;
 }
+
+bool isBrick_right(int xloc, int yloc)
+{
+	int x_coord = (xloc + LEP_WIDTH) / BRICK_HEIGHT;
+	int x_remainder = (xloc + LEP_WIDTH) % BRICK_HEIGHT;
+	int y_coord = (yloc) / BRICK_HEIGHT;
+	int y_remainder = (yloc) % BRICK_HEIGHT;
+	if (gBrickCoordinates[y_coord][x_coord] == 1) {
+		return true;
+	}
+	else if (gBrickCoordinates[y_coord + 1][x_coord] == 1)
+		return true;
+	else {
+			return false;
+	}
+}
+
+bool isBrick_left(int xloc, int yloc)
+{
+	int x_coord = (xloc) / BRICK_HEIGHT;
+	int x_remainder = (xloc) % BRICK_HEIGHT;
+	int y_coord = (yloc) / BRICK_HEIGHT;
+	int y_remainder = (yloc) % BRICK_HEIGHT;
+	if (gBrickCoordinates[y_coord][x_coord] == 1) {
+		return true;
+	}
+	else if (gBrickCoordinates[y_coord + 1][x_coord] == 1)
+		return true;
+	else {
+			return false;
+	}
+}
+
+int space_brick_down(int xloc, int yloc) 
+{
+	int brick_space = 0;
+	do					
+	{
+	++brick_space;
+	if (brick_space + yloc + LEP_HEIGHT == SCREEN_HEIGHT) 
+		break;
+	} while (!isBrick_down(xloc, yloc + brick_space) ); 
+	
+	return brick_space;
+}
 int main( int argc, char* args[] )
 {
 	get_coordinates();
@@ -476,6 +520,10 @@ int main( int argc, char* args[] )
 	int render_mario_xloc = SCREEN_WIDTH/2;
 	int mario_xcoord = SCREEN_WIDTH/2;
 	int mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
+	bool jumping = false;
+	bool mario_down = false;
+	int jump_height = 0;
+	int max_jump_height = 100;
 	//Start up SDL and create window
 	if( !init() )
 	{
@@ -519,9 +567,10 @@ int main( int argc, char* args[] )
                         switch( e.key.keysym.sym )
                         {
                             case SDLK_UP:
-									 	if ( gMapLocation.y > 1 )
-                            		
-                            break;
+									 	if ( isBrick_down(mario_xcoord, mario_ycoord) ) {
+											jumping = true;
+										}
+									 break;
 
                             case SDLK_DOWN:
                             	if ( gMapLocation.y < SCREEN_HEIGHT - 60 )
@@ -530,7 +579,7 @@ int main( int argc, char* args[] )
 
                             case SDLK_LEFT:
                             	if ( gMapLocation.x > 2 ) {
-											if (isBrick(mario_xcoord, mario_ycoord) ) {
+											if (isBrick_down(mario_xcoord, mario_ycoord)  && !isBrick_left(mario_xcoord, mario_ycoord) ) {
 												frame_left++;
 												gMapLocation.x -= 5;	
 												mario_xcoord -= 5;
@@ -541,7 +590,7 @@ int main( int argc, char* args[] )
 
                             case SDLK_RIGHT:
                             	if ( gMapLocation.x <  2000 - 500 ) {
-											if (isBrick(mario_xcoord, mario_ycoord)) {
+											if (!isBrick_right(mario_xcoord, mario_ycoord) ){
 												frame_right++;
 												gMapLocation.x += 5;	
 												mario_xcoord += 5;
@@ -566,24 +615,29 @@ int main( int argc, char* args[] )
 	
 				// Render Bricks on map
 				render_Bricks();
+			
+				// update jumping
 				/*
-				if (isBrick(mario_xcoord, mario_ycoord) ) {
-					cout << "is Brick is TRUE at " << mario_xcoord << " " << mario_ycoord << endl;
+			   cout << "jump_height is " << jump_height << " mario down is " << mario_down << endl;
+				if (jumping && jump_height < max_jump_height && !mario_down) {
+					mario_ycoord -= 10;
+					jump_height += 10;
 				}
-				else {
-					cout << "is Brick is FALSE at " << mario_xcoord << " " << mario_ycoord << endl;
+				if (jumping && (jump_height >= max_jump_height || mario_down) ) {
+					mario_ycoord += 10;
+					jump_height -= 10;
+					mario_down = true;
+				}
+				if (jumping && mario_down && jump_height == 0) {
+					jumping = false;
+					mario_down = false;
 				}*/
-				if (!isBrick(mario_xcoord, mario_ycoord) ) {
-					mario_ycoord += 4;
-					/*
-					int brick_space = 1;
-					while (!isBrick(mario_xcoord, mario_ycoord + brick_space) )
-						++brick_space;
+				if (!isBrick_down(mario_xcoord, mario_ycoord)  && !jumping) {
+					int brick_space = space_brick_down(mario_xcoord, mario_ycoord);
 					if (brick_space > 6)
 						mario_ycoord += 6;
 					else
 						mario_ycoord += brick_space;
-					*/
 				}
 				if (mario_right) {
 					SDL_Rect* currentClip = &gRightSprite[ frame_right / 5 ];

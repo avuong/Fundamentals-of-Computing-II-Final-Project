@@ -448,7 +448,7 @@ void close()
 	SDL_Quit();
 }
 
-bool isBrick_down(int xloc, int yloc)
+bool isBrick(int xloc, int yloc)
 {
 	int x_coord = xloc/BRICK_HEIGHT;
 	int x_remainder = xloc % BRICK_HEIGHT;
@@ -467,51 +467,6 @@ bool isBrick_down(int xloc, int yloc)
 	}
 	return false;
 }
-
-bool isBrick_right(int xloc, int yloc)
-{
-	int x_coord = (xloc + LEP_WIDTH) / BRICK_HEIGHT;
-	int x_remainder = (xloc + LEP_WIDTH) % BRICK_HEIGHT;
-	int y_coord = (yloc) / BRICK_HEIGHT;
-	int y_remainder = (yloc) % BRICK_HEIGHT;
-	if (gBrickCoordinates[y_coord][x_coord] == 1) {
-		return true;
-	}
-	else if (gBrickCoordinates[y_coord + 1][x_coord] == 1)
-		return true;
-	else {
-			return false;
-	}
-}
-
-bool isBrick_left(int xloc, int yloc)
-{
-	int x_coord = (xloc) / BRICK_HEIGHT;
-	int x_remainder = (xloc) % BRICK_HEIGHT;
-	int y_coord = (yloc) / BRICK_HEIGHT;
-	int y_remainder = (yloc) % BRICK_HEIGHT;
-	if (gBrickCoordinates[y_coord][x_coord] == 1) {
-		return true;
-	}
-	else if (gBrickCoordinates[y_coord + 1][x_coord] == 1)
-		return true;
-	else {
-			return false;
-	}
-}
-
-int space_brick_down(int xloc, int yloc) 
-{
-	int brick_space = 0;
-	do					
-	{
-	++brick_space;
-	if (brick_space + yloc + LEP_HEIGHT == SCREEN_HEIGHT) 
-		break;
-	} while (!isBrick_down(xloc, yloc + brick_space) ); 
-	
-	return brick_space;
-}
 int main( int argc, char* args[] )
 {
 	get_coordinates();
@@ -520,11 +475,10 @@ int main( int argc, char* args[] )
 	int render_mario_xloc = SCREEN_WIDTH/2;
 	int mario_xcoord = SCREEN_WIDTH/2;
 	int mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
-	bool jumping = false;
-	bool mario_down = false;
-	int jump_height = 0;
-	int max_jump_height = 150;
+	int mario_yvel = 0;
+	int canMove = 1;
 	//Start up SDL and create window
+
 	if( !init() )
 	{
 		printf( "Failed to initialize!\n" );
@@ -560,19 +514,75 @@ int main( int argc, char* args[] )
 					{
 						quit = true;
 					}
+					//User presses a key
+				} //delete if need to
+                  /*  if( e.type == SDL_KEYDOWN )
+                    {
+                        //Select surfaces based on key press
+                        switch( e.key.keysym.sym )
+                        {
+                            case SDLK_SPACE:
+				//if ( gMapLocation.y > 1 )
+                            	mario_ycoord -= 70;	
+                            break;
+
+                            case SDLK_DOWN:
+                            	if ( gMapLocation.y < SCREEN_HEIGHT - 60 )
+											
+                            break;
+
+                            case SDLK_LEFT:
+                            	if ( gMapLocation.x > 2 ) {
+					if (isBrick(mario_xcoord, mario_ycoord) ) {
+						frame_left++;
+						gMapLocation.x -= 5;	
+						mario_xcoord -= 5;
+						mario_right = false;
+					}
 				}
-            const Uint8* currentKeyStates = SDL_GetKeyboardState( NULL );
+                            break;
+
+                            case SDLK_RIGHT:
+                            	if ( gMapLocation.x <  2000 - 500 ) {
+					if (isBrick(mario_xcoord, mario_ycoord)) {
+						frame_right++;
+						gMapLocation.x += 5;	
+						mario_xcoord += 5;
+						mario_right = true;
+					}
+				}
+                            break;
+
+                            default:
+                            	break;
+                        } // end switch
+                    } // end if
+
+ 		if( e.type == SDL_KEYUP )
+                    {
+                        //Select surfaces based on key press
+                        switch( e.key.keysym.sym )
+                        {
+                            case SDLK_SPACE:
+				while (!isBrick(mario_xcoord, mario_ycoord))
+                            		mario_ycoord += 1;	
+                            break;
+			}
+		}
+				} */
+//Set texture based on current keystate
+				const Uint8* currentKeyStates = SDL_GetKeyboardState( NULL );
 				if( currentKeyStates[ SDL_SCANCODE_UP ] )
 				{	
-					if(isBrick_down(mario_xcoord, mario_ycoord))
-						mario_ycoord -= max_jump_height;	
+					if(isBrick(mario_xcoord, mario_ycoord))
+					mario_ycoord -= 70;	
 				}
 				else if( currentKeyStates[ SDL_SCANCODE_DOWN ] )
 				{
 				}
-				else if( currentKeyStates[ SDL_SCANCODE_LEFT ])
+				else if( currentKeyStates[ SDL_SCANCODE_LEFT ] && canMove==1)
 				{
-					if ( gMapLocation.x > 2  && !isBrick_left(mario_xcoord, mario_ycoord) ) {
+					if ( gMapLocation.x > 2 ) {
 						//if(isBrick(mario_xcoord, mario_ycoord) ) {
 							frame_left++;
 							gMapLocation.x -= 5;	
@@ -581,9 +591,9 @@ int main( int argc, char* args[] )
 						//}
 					}
 				}
-				else if( currentKeyStates[ SDL_SCANCODE_RIGHT ])
+				else if( currentKeyStates[ SDL_SCANCODE_RIGHT ] && canMove==1)
 				{
-					if ( gMapLocation.x <  2000 - 500 && !isBrick_right(mario_xcoord, mario_ycoord) ) {
+					if ( gMapLocation.x <  2000 - 500 ) {
 						//if (isBrick(mario_xcoord, mario_ycoord)) {
 							frame_right++;
 							gMapLocation.x += 5;		
@@ -593,7 +603,28 @@ int main( int argc, char* args[] )
 					}
 					
 				}
+				else if( currentKeyStates[ SDL_SCANCODE_SPACE ] ){
+					if(isBrick(mario_xcoord, mario_ycoord))
+					mario_ycoord -= 70;	
 
+				}
+				/*else if( currentKeyStates[ SDL_SCANCODE_SPACE ]  && currentKeyStates[ SDL_SCANCODE_RIGHT ]){
+					if ( gMapLocation.x <  2000 - 500 ) {
+						//if (isBrick(mario_xcoord, mario_ycoord)) {
+							frame_right++;
+							gMapLocation.x += 5;		
+							mario_xcoord += 5;
+							mario_right = true;
+						//}
+					}
+
+					if(isBrick(mario_xcoord, mario_ycoord))
+						mario_ycoord -= 70;
+				}*/	
+				else
+				{
+
+				}
 				//Clear screen
 				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( gRenderer );
@@ -604,29 +635,28 @@ int main( int argc, char* args[] )
 	
 				// Render Bricks on map
 				render_Bricks();
-			
-				// update jumping
 				/*
-			   cout << "jump_height is " << jump_height << " mario down is " << mario_down << endl;
-				if (jumping && jump_height < max_jump_height && !mario_down) {
-					mario_ycoord -= 10;
-					jump_height += 10;
+				if (isBrick(mario_xcoord, mario_ycoord) ) {
+					cout << "is Brick is TRUE at " << mario_xcoord << " " << mario_ycoord << endl;
 				}
-				if (jumping && (jump_height >= max_jump_height || mario_down) ) {
-					mario_ycoord += 10;
-					jump_height -= 10;
-					mario_down = true;
-				}
-				if (jumping && mario_down && jump_height == 0) {
-					jumping = false;
-					mario_down = false;
+				else {
+					cout << "is Brick is FALSE at " << mario_xcoord << " " << mario_ycoord << endl;
 				}*/
-				if (!isBrick_down(mario_xcoord, mario_ycoord)) {
-					int brick_space = space_brick_down(mario_xcoord, mario_ycoord);
-					if (brick_space > 20)
-						mario_ycoord += 20;
+				if (!isBrick(mario_xcoord, mario_ycoord) ) {
+					mario_ycoord += 4;
+					cout<< mario_ycoord <<endl;
+					if(mario_ycoord > 375){
+						canMove = 0;
+					}
+					/*
+					int brick_space = 1;
+					while (!isBrick(mario_xcoord, mario_ycoord + brick_space) )
+						++brick_space;
+					if (brick_space > 6)
+						mario_ycoord += 6;
 					else
 						mario_ycoord += brick_space;
+					*/
 				}
 				if (mario_right) {
 					SDL_Rect* currentClip = &gRightSprite[ frame_right / 5 ];
