@@ -455,11 +455,11 @@ bool isBrick_down(int xloc, int yloc)
 	int y_coord = (yloc + LEP_HEIGHT) / BRICK_HEIGHT;
 	int y_remainder = (yloc + LEP_HEIGHT) % BRICK_HEIGHT;
 
-	if (gBrickCoordinates[y_coord][x_coord] == 1) {
+	if (gBrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH - 5) {
 		return true;
 	}
 	else {
-		if (x_remainder > BRICK_WIDTH - LEP_WIDTH) {
+		if (x_remainder > BRICK_WIDTH - LEP_WIDTH + 5) {
 			if (gBrickCoordinates[y_coord][x_coord+1] == 1) {
 				return true;
 			}
