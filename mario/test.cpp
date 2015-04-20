@@ -524,6 +524,7 @@ int main( int argc, char* args[] )
 	bool mario_down = false;
 	int jump_height = 0;
 	int max_jump_height = 150;
+	int mario_yVel= 0;
 	//Start up SDL and create window
 	if( !init() )
 	{
@@ -564,8 +565,15 @@ int main( int argc, char* args[] )
             const Uint8* currentKeyStates = SDL_GetKeyboardState( NULL );
 				if( currentKeyStates[ SDL_SCANCODE_UP ] )
 				{	
-					if(isBrick_down(mario_xcoord, mario_ycoord))
-						mario_ycoord -= max_jump_height;	
+					if(isBrick_down(mario_xcoord, mario_ycoord)){
+						//mario_ycoord -= max_jump_height;
+					if (!jumping)
+					{
+  						jumping = true;
+  						mario_yVel = 0;
+					}
+					}
+					
 				}
 				else if( currentKeyStates[ SDL_SCANCODE_DOWN ] )
 				{
@@ -593,7 +601,17 @@ int main( int argc, char* args[] )
 					}
 					
 				}
-
+				if (jumping == true)
+				{
+					mario_yVel -= 20;
+					mario_ycoord = mario_ycoord + mario_yVel;
+					if (mario_yVel == -100)
+					{
+						mario_yVel = 0;
+						mario_yVel += 60;
+						jumping = false;
+					}
+				}
 				//Clear screen
 				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( gRenderer );
@@ -657,7 +675,7 @@ int main( int argc, char* args[] )
 			}
 		}
 	}
-
+	
 	//Free resources and close SDL
 	close();
 
