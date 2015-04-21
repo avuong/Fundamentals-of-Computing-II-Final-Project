@@ -411,19 +411,7 @@ int space_brick_up(int xloc, int yloc)
 
 int isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
 {
-	/*for(int i = potLocX; i < potLocX +200; i++){ //+200 because width of the pot of Gold
-		for(int j = spriteX; i < spriteX+27; j++){
-			if((i == j) && (potLocY==spriteY)){
-				cout<< "ON THE POT"<<endl;
-				return;
-			}
-			else{
-				cout<< "Not on the pot" <<endl;
-				return;
-			}
-		}
-	}
-	//cout<< "hello" <<endl;*/
+
 
 	if( spriteX - potLocX >= 1500 && spriteX - potLocX <= 1580 && spriteY >= 369){
 		cout<< "ON THE POT, you win" <<endl;
