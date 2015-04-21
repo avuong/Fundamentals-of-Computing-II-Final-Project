@@ -314,6 +314,26 @@ bool isBrick_down(int xloc, int yloc)
 	return false;
 }
 
+bool isBrick_up(int xloc, int yloc)
+{
+	int x_coord = xloc/BRICK_HEIGHT;
+	int x_remainder = xloc % BRICK_HEIGHT;
+	int y_coord = (yloc + 4) / BRICK_HEIGHT;
+	int y_remainder = (yloc) % BRICK_HEIGHT;
+
+	if (gBrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH - 5) {
+		return true;
+	}
+	else {
+		if (x_remainder > BRICK_WIDTH - LEP_WIDTH + 5) {
+			if (gBrickCoordinates[y_coord][x_coord+1] == 1) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 bool isBrick_right(int xloc, int yloc)
 {
 	int x_coord = (xloc + LEP_WIDTH + 2) / BRICK_HEIGHT;
@@ -355,6 +375,19 @@ int space_brick_down(int xloc, int yloc)
 	if (brick_space + yloc + LEP_HEIGHT == SCREEN_HEIGHT) 
 		break;
 	} while (!isBrick_down(xloc, yloc + brick_space) ); 
+	
+	return brick_space;
+}
+
+int space_brick_up(int xloc, int yloc)
+{
+	int brick_space = 0;
+	do					
+	{
+	++brick_space;
+	if (yloc - brick_space == 0) 
+		break;
+	} while (!isBrick_up(xloc, yloc - brick_space) ); 
 	
 	return brick_space;
 }
@@ -449,8 +482,18 @@ int main( int argc, char* args[] )
 				}
 				if (jumping == true)
 				{
-					mario_yVel -= 6;
+					if (!isBrick_up(mario_xcoord, mario_ycoord)) {
+						int brick_space_up = space_brick_up(mario_xcoord, mario_ycoord);
+						if (brick_space_up > 6)
+							mario_yVel -= 6;
+						else
+							mario_yVel -= brick_space_up;
 					mario_ycoord = mario_ycoord + mario_yVel;
+					}
+					else {
+						mario_yVel = -60;
+						jumping = false;
+					}
 					if (mario_yVel == -60)
 					{
 						mario_yVel = 0;
@@ -486,11 +529,11 @@ int main( int argc, char* args[] )
 					mario_down = false;
 				}*/
 				if (!isBrick_down(mario_xcoord, mario_ycoord)) {
-					int brick_space = space_brick_down(mario_xcoord, mario_ycoord);
-					if (brick_space > 20)
+					int brick_space_down = space_brick_down(mario_xcoord, mario_ycoord);
+					if (brick_space_down > 20)
 						mario_ycoord += 20;
 					else
-						mario_ycoord += brick_space;
+						mario_ycoord += brick_space_down;
 				}
 				if (mario_right) {
 					SDL_Rect* currentClip = &gRightSprite[ frame_right / 5 ];
