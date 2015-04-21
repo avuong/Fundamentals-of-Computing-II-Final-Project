@@ -449,7 +449,7 @@ int main( int argc, char* args[] )
 				}
 				if (jumping == true)
 				{
-					mario_yVel -= 6;
+					mario_yVel -= 5;
 					mario_ycoord = mario_ycoord + mario_yVel;
 					if (mario_yVel == -60)
 					{
