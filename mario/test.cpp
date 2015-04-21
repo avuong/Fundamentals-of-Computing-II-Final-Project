@@ -452,7 +452,7 @@ bool isBrick_down(int xloc, int yloc)
 {
 	int x_coord = xloc/BRICK_HEIGHT;
 	int x_remainder = xloc % BRICK_HEIGHT;
-	int y_coord = (yloc + LEP_HEIGHT) / BRICK_HEIGHT;
+	int y_coord = (yloc + LEP_HEIGHT - 4) / BRICK_HEIGHT;
 	int y_remainder = (yloc + LEP_HEIGHT) % BRICK_HEIGHT;
 
 	if (gBrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH - 5) {
@@ -605,7 +605,7 @@ int main( int argc, char* args[] )
 				{
 					mario_yVel -= 20;
 					mario_ycoord = mario_ycoord + mario_yVel;
-					if (mario_yVel == -100)
+					if (mario_yVel <= -100)
 					{
 						mario_yVel = 0;
 						mario_yVel += 60;
@@ -639,8 +639,14 @@ int main( int argc, char* args[] )
 					jumping = false;
 					mario_down = false;
 				}*/
+				int x_remainder = mario_xcoord % BRICK_WIDTH;
+				int brick_space;
 				if (!isBrick_down(mario_xcoord, mario_ycoord)) {
-					int brick_space = space_brick_down(mario_xcoord, mario_ycoord);
+					//if (x_remainder > BRICK_WIDTH - LEP_WIDTH + 5)
+					//	brick_space = space_brick_down(mario_xcoord+32, mario_ycoord);
+					//else
+						brick_space = space_brick_down(mario_xcoord, mario_ycoord);
+					//cout << mario_ycoord << " " << mario_xcoord <<  " " << brick_space << endl;
 					if (brick_space > 20)
 						mario_ycoord += 20;
 					else
