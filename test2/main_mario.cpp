@@ -409,7 +409,7 @@ int space_brick_up(int xloc, int yloc)
 	return brick_space;
 }
 
-int isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
+void isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
 {
 	/*for(int i = potLocX; i < potLocX +200; i++){ //+200 because width of the pot of Gold
 		for(int j = spriteX; i < spriteX+27; j++){
@@ -427,7 +427,6 @@ int isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
 
 	if( spriteX - potLocX >= 1500 && spriteX - potLocX <= 1580 && spriteY >= 369){
 		cout<< "ON THE POT, you win" <<endl;
-		return 1;
 	}
 }
 int main( int argc, char* args[] )
@@ -554,10 +553,9 @@ int main( int argc, char* args[] )
 				//Render pot of Gold
 				SDL_Rect* potOfGold = &gGoldLocation;
 				gGold.render(1670- gMapLocation.x, 330, potOfGold);
-				if(isPotCollide(1670- gMapLocation.x, mario_xcoord, 330, mario_ycoord + 27))
-					backgroundName = "levelTwo.png";
-				cout<< "Pot loc x: " << 1670- gMapLocation.x <<endl;
-				cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
+				isPotCollide(1670- gMapLocation.x, mario_xcoord, 330, mario_ycoord + 27);
+				//cout<< "Pot loc x: " << 1670- gMapLocation.x <<endl;
+				//cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
 				// update jumping
 				/*
 			   cout << "jump_height is " << jump_height << " mario down is " << mario_down << endl;

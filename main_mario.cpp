@@ -69,7 +69,11 @@ SDL_Rect gBrickLocation;
 LTexture gBrick;
 vector<vector<int> > gBrickCoordinates;
 
+//Pot of Gold Rendering
+SDL_Rect gGoldLocation;
+LTexture gGold;
 
+string backgroundName = "background.png";
 bool init()
 {
 	//Initialization flag
@@ -200,7 +204,7 @@ bool loadMedia()
 		gLeftSprite[ 4 ].h = 43;
 	}
 	//Load sprite sheet texture
-	if( !gMap.loadFromFile( "background.png", "white" ) )
+	if( !gMap.loadFromFile( backgroundName.c_str(), "white" ) )
 	{
 		printf( "Failed to load walking animation texture!\n" );
 		success = false;
@@ -211,6 +215,19 @@ bool loadMedia()
 		gMapLocation.y = 0;
 		gMapLocation.w = SCREEN_WIDTH;
 		gMapLocation.h = SCREEN_HEIGHT;
+	}	
+	//Load sprite sheet texture
+	if( !gGold.loadFromFile( "gold.png", "white" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gGoldLocation.x = 0;	
+		gGoldLocation.y = 0;
+		gGoldLocation.w = 200;
+		gGoldLocation.h = 200;
 	}
 	//Load sprite sheet texture
 	if( !gBrick.loadFromFile( "brick.png", "green" ) )
@@ -298,10 +315,10 @@ bool isBrick_down(int xloc, int yloc)
 {
 	int x_coord = xloc/BRICK_HEIGHT;
 	int x_remainder = xloc % BRICK_HEIGHT;
-	int y_coord = (yloc + LEP_HEIGHT - 3) / BRICK_HEIGHT;
+	int y_coord = (yloc + LEP_HEIGHT - 1) / BRICK_HEIGHT;
 	int y_remainder = (yloc + LEP_HEIGHT) % BRICK_HEIGHT;
 
-	if (gBrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH - 5) {
+	if (gBrickCoordinates[y_coord][x_coord] == 1/* && x_remainder < LEP_WIDTH - 2*/) {
 		return true;
 	}
 	else {
@@ -318,10 +335,10 @@ bool isBrick_up(int xloc, int yloc)
 {
 	int x_coord = xloc/BRICK_HEIGHT;
 	int x_remainder = xloc % BRICK_HEIGHT;
-	int y_coord = (yloc + 4) / BRICK_HEIGHT;
+	int y_coord = (yloc - 32) / BRICK_HEIGHT;
 	int y_remainder = (yloc) % BRICK_HEIGHT;
 
-	if (gBrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH - 5) {
+	if (gBrickCoordinates[y_coord][x_coord] == 1 /*&& x_remainder < LEP_WIDTH - 5*/) {
 		return true;
 	}
 	else {
@@ -336,9 +353,9 @@ bool isBrick_up(int xloc, int yloc)
 
 bool isBrick_right(int xloc, int yloc)
 {
-	int x_coord = (xloc + LEP_WIDTH + 2) / BRICK_HEIGHT;
+	int x_coord = (xloc + LEP_WIDTH + 4) / BRICK_HEIGHT;
 	int x_remainder = (xloc + LEP_WIDTH) % BRICK_HEIGHT;
-	int y_coord = (yloc) / BRICK_HEIGHT;
+	int y_coord = (yloc + 4) / BRICK_HEIGHT;
 	int y_remainder = (yloc) % BRICK_HEIGHT;
 	if (gBrickCoordinates[y_coord][x_coord] == 1) {
 		return true;
@@ -352,9 +369,9 @@ bool isBrick_right(int xloc, int yloc)
 
 bool isBrick_left(int xloc, int yloc)
 {
-	int x_coord = (xloc) / BRICK_HEIGHT;
+	int x_coord = (xloc - 4) / BRICK_HEIGHT;
 	int x_remainder = (xloc) % BRICK_HEIGHT;
-	int y_coord = (yloc) / BRICK_HEIGHT;
+	int y_coord = (yloc + 4) / BRICK_HEIGHT;
 	int y_remainder = (yloc) % BRICK_HEIGHT;
 	if (gBrickCoordinates[y_coord][x_coord] == 1) {
 		return true;
@@ -385,11 +402,33 @@ int space_brick_up(int xloc, int yloc)
 	do					
 	{
 	++brick_space;
-	if (yloc - brick_space == 0) 
+	if (yloc - brick_space - 4 == 0) 
 		break;
 	} while (!isBrick_up(xloc, yloc - brick_space) ); 
 	
 	return brick_space;
+}
+
+
+void isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
+{
+	/*for(int i = potLocX; i < potLocX +200; i++){ //+200 because width of the pot of Gold
+		for(int j = spriteX; i < spriteX+27; j++){
+			if((i == j) && (potLocY==spriteY)){
+				cout<< "ON THE POT"<<endl;
+				return;
+			}
+			else{
+				cout<< "Not on the pot" <<endl;
+				return;
+			}
+		}
+	}
+	//cout<< "hello" <<endl;*/
+
+	if( spriteX - potLocX >= 1500 && spriteX - potLocX <= 1580 && spriteY >= 369){
+		cout<< "ON THE POT, you win" <<endl;
+	}
 }
 int main( int argc, char* args[] )
 {
@@ -511,7 +550,13 @@ int main( int argc, char* args[] )
 	
 				// Render Bricks on map
 				render_Bricks();
-			
+				
+				//Render pot of Gold
+				SDL_Rect* potOfGold = &gGoldLocation;
+				gGold.render(1670- gMapLocation.x, 330, potOfGold);
+				isPotCollide(1670- gMapLocation.x, mario_xcoord, 330, mario_ycoord + 27);
+				//cout<< "Pot loc x: " << 1670- gMapLocation.x <<endl;
+				//cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
 				// update jumping
 				/*
 			   cout << "jump_height is " << jump_height << " mario down is " << mario_down << endl;
