@@ -11,6 +11,8 @@ and may not be redistributed without written permission.*/
 #include <vector>
 #include <iostream>
 #include "LTexture.h"
+#include "Map.h"
+//#include "globalConstants.h"
 
 using namespace std;
 
@@ -50,7 +52,6 @@ void close();
 //The window we'll be rendering to
 SDL_Window* gWindow = NULL;
 
-
 //Walking animation right
 const int WALKING_ANIMATION_FRAMES = 5;
 SDL_Rect gRightSprite[ WALKING_ANIMATION_FRAMES ];
@@ -65,9 +66,9 @@ SDL_Rect gMapLocation;
 LTexture gMap;
 
 // Brick Rendering
-SDL_Rect gBrickLocation;
-LTexture gBrick;
-vector<vector<int> > gBrickCoordinates;
+Map level_one;
+Map level_two;
+Map * levelPtr = &level_one;
 
 //Pot of Gold Rendering
 SDL_Rect gGoldLocation;
@@ -229,71 +230,10 @@ bool loadMedia()
 		gGoldLocation.w = 200;
 		gGoldLocation.h = 200;
 	}
-	//Load sprite sheet texture
-	if( !gBrick.loadFromFile( "brick.png", "green" ) )
-	{
-		
-		printf( "Failed to load walking animation texture!\n" );
-		success = false;
-	}
-	else
-	{
-		gBrickLocation.x = 0;	
-		gBrickLocation.y = 0;
-		gBrickLocation.w = 32;
-		gBrickLocation.h = 32;
-	}
 	
 	return success;
 }
 
-void get_coordinates()
-{
-	ifstream map_file;
-	string file = "bricks";
-	map_file.open(file.c_str());
-	vector<int> temp;
-	int num;
-	while (!map_file.eof()) {
-		map_file >> num;
-		if (num != 2)
-			temp.push_back(num);
-		else {
-			gBrickCoordinates.push_back(temp);
-			temp.clear();
-		}
-	}
-	for (int i = 0; i < gBrickCoordinates.size(); i++) {
-		for (int j = 0; j < gBrickCoordinates[i].size(); j++) {
-			//cout << gBrickCoordinates[i][j] << ' ';
-		}
-		//cout << endl;
-	}
-}
-void render_Bricks()
-{
-	//Render current Map Frame
-	SDL_Rect* currentMap = &gBrickLocation;
-	int location[2];
-	location[X] = 0;
-	location[Y] = 0;
-	
-	for (int i = 0; i < gBrickCoordinates.size(); i++) {
-		location[Y] = i*32;
-		for (int j = 0; j < gBrickCoordinates[i].size(); j++) {
-				//cout << "xloc is " << location[X] << " yloc is " << location[Y] << " gBrickCoordinates[i][j] " << gBrickCoordinates[i][j] << " i is " << i << " j is " << j << endl;
-				location[X] = j*32;
-				if (gBrickCoordinates[i][j] == 1) {
-					currentMap = &gBrickLocation;
-				//	cout << "RENDERED: xloc is " << location[X] << " yloc is " << location[Y] << endl;
-					gBrick.render( location[X] - gMapLocation.x, location[Y], currentMap );
-				}	
-		}
-		location[Y] = i*32;
-	}
-	//cout << "size i = " << gBrickCoordinates.size() << "size j = " << gBrickCoordinates[1].size() << endl;
-	
-}
 void close()
 {
 	//Free loaded images
@@ -311,103 +251,6 @@ void close()
 	SDL_Quit();
 }
 
-bool isBrick_down(int xloc, int yloc)
-{
-	int x_coord = xloc/BRICK_HEIGHT;
-	int x_remainder = xloc % BRICK_HEIGHT;
-	int y_coord = (yloc + LEP_HEIGHT - 3) / BRICK_HEIGHT;
-	int y_remainder = (yloc + LEP_HEIGHT) % BRICK_HEIGHT;
-
-	if (gBrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH - 5) {
-		return true;
-	}
-	else {
-		if (x_remainder > BRICK_WIDTH - LEP_WIDTH + 5) {
-			if (gBrickCoordinates[y_coord][x_coord+1] == 1) {
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-bool isBrick_up(int xloc, int yloc)
-{
-	int x_coord = xloc/BRICK_HEIGHT;
-	int x_remainder = xloc % BRICK_HEIGHT;
-	int y_coord = (yloc + 4) / BRICK_HEIGHT;
-	int y_remainder = (yloc) % BRICK_HEIGHT;
-
-	if (gBrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH - 5) {
-		return true;
-	}
-	else {
-		if (x_remainder > BRICK_WIDTH - LEP_WIDTH + 5) {
-			if (gBrickCoordinates[y_coord][x_coord+1] == 1) {
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-bool isBrick_right(int xloc, int yloc)
-{
-	int x_coord = (xloc + LEP_WIDTH + 2) / BRICK_HEIGHT;
-	int x_remainder = (xloc + LEP_WIDTH) % BRICK_HEIGHT;
-	int y_coord = (yloc) / BRICK_HEIGHT;
-	int y_remainder = (yloc) % BRICK_HEIGHT;
-	if (gBrickCoordinates[y_coord][x_coord] == 1) {
-		return true;
-	}
-	else if (gBrickCoordinates[y_coord + 1][x_coord] == 1)
-		return true;
-	else {
-			return false;
-	}
-}
-
-bool isBrick_left(int xloc, int yloc)
-{
-	int x_coord = (xloc) / BRICK_HEIGHT;
-	int x_remainder = (xloc) % BRICK_HEIGHT;
-	int y_coord = (yloc) / BRICK_HEIGHT;
-	int y_remainder = (yloc) % BRICK_HEIGHT;
-	if (gBrickCoordinates[y_coord][x_coord] == 1) {
-		return true;
-	}
-	else if (gBrickCoordinates[y_coord + 1][x_coord] == 1)
-		return true;
-	else {
-			return false;
-	}
-}
-
-int space_brick_down(int xloc, int yloc) 
-{
-	int brick_space = 0;
-	do					
-	{
-	++brick_space;
-	if (brick_space + yloc + LEP_HEIGHT == SCREEN_HEIGHT) 
-		break;
-	} while (!isBrick_down(xloc, yloc + brick_space) ); 
-	
-	return brick_space;
-}
-
-int space_brick_up(int xloc, int yloc)
-{
-	int brick_space = 0;
-	do					
-	{
-	++brick_space;
-	if (yloc - brick_space == 0) 
-		break;
-	} while (!isBrick_up(xloc, yloc - brick_space) ); 
-	
-	return brick_space;
-}
 
 void isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
 {
@@ -431,7 +274,7 @@ void isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
 }
 int main( int argc, char* args[] )
 {
-	get_coordinates();
+	levelPtr->get_coordinates();
 	usleep(10000);
 	int render_mario_yloc = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
 	int render_mario_xloc = SCREEN_WIDTH/2;
@@ -449,6 +292,7 @@ int main( int argc, char* args[] )
 	}
 	else
 	{
+		if (levelPtr->load_bricks() );
 		//Load media
 		if( !loadMedia() )
 		{
@@ -482,7 +326,7 @@ int main( int argc, char* args[] )
             const Uint8* currentKeyStates = SDL_GetKeyboardState( NULL );
 				if( currentKeyStates[ SDL_SCANCODE_UP ] )
 				{	
-					if(isBrick_down(mario_xcoord, mario_ycoord)){
+					if(levelPtr->isBrick_down(mario_xcoord, mario_ycoord)){
 						//mario_ycoord -= max_jump_height;
 					if (!jumping)
 					{
@@ -497,7 +341,7 @@ int main( int argc, char* args[] )
 				}
 				else if( currentKeyStates[ SDL_SCANCODE_LEFT ])
 				{
-					if ( gMapLocation.x > 2  && !isBrick_left(mario_xcoord, mario_ycoord) ) {
+					if ( gMapLocation.x > 2  && !levelPtr->isBrick_left(mario_xcoord, mario_ycoord) ) {
 						//if(isBrick(mario_xcoord, mario_ycoord) ) {
 							frame_left++;
 							gMapLocation.x -= 5;	
@@ -508,7 +352,7 @@ int main( int argc, char* args[] )
 				}
 				else if( currentKeyStates[ SDL_SCANCODE_RIGHT ])
 				{
-					if ( gMapLocation.x <  2000 - 500 && !isBrick_right(mario_xcoord, mario_ycoord) ) {
+					if ( gMapLocation.x <  2000 - 500 && !levelPtr->isBrick_right(mario_xcoord, mario_ycoord) ) {
 						//if (isBrick(mario_xcoord, mario_ycoord)) {
 							frame_right++;
 							gMapLocation.x += 5;		
@@ -520,8 +364,8 @@ int main( int argc, char* args[] )
 				}
 				if (jumping == true)
 				{
-					if (!isBrick_up(mario_xcoord, mario_ycoord)) {
-						int brick_space_up = space_brick_up(mario_xcoord, mario_ycoord);
+					if (!levelPtr->isBrick_up(mario_xcoord, mario_ycoord)) {
+						int brick_space_up = levelPtr->space_brick_up(mario_xcoord, mario_ycoord);
 						if (brick_space_up > 6)
 							mario_yVel -= 6;
 						else
@@ -548,7 +392,7 @@ int main( int argc, char* args[] )
 				gMap.render( 0, 0, currentMap );
 	
 				// Render Bricks on map
-				render_Bricks();
+				levelPtr->render_Bricks(gMapLocation.x);
 				
 				//Render pot of Gold
 				SDL_Rect* potOfGold = &gGoldLocation;
@@ -572,8 +416,8 @@ int main( int argc, char* args[] )
 					jumping = false;
 					mario_down = false;
 				}*/
-				if (!isBrick_down(mario_xcoord, mario_ycoord)) {
-					int brick_space_down = space_brick_down(mario_xcoord, mario_ycoord);
+				if (!levelPtr->isBrick_down(mario_xcoord, mario_ycoord)) {
+					int brick_space_down = levelPtr->space_brick_down(mario_xcoord, mario_ycoord);
 					if (brick_space_down > 20)
 						mario_ycoord += 20;
 					else
