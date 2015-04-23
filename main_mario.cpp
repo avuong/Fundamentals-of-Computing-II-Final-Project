@@ -73,6 +73,10 @@ vector<vector<int> > gBrickCoordinates;
 SDL_Rect gGoldLocation;
 LTexture gGold;
 
+//Shamrock Rendering
+SDL_Rect gShamrockLocation;
+LTexture gShamrock;
+
 string backgroundName = "background.png";
 bool init()
 {
@@ -229,6 +233,21 @@ bool loadMedia()
 		gGoldLocation.w = 200;
 		gGoldLocation.h = 200;
 	}
+
+	//Load sprite sheet texture
+	if( !gShamrock.loadFromFile( "shamrock.png", "white" ) ) 
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gShamrockLocation.x = 0;	
+		gShamrockLocation.y = 0;
+		gShamrockLocation.w = 48;
+		gShamrockLocation.h = 48;
+	}
+
 	//Load sprite sheet texture
 	if( !gBrick.loadFromFile( "brick.png", "green" ) )
 	{
@@ -443,6 +462,7 @@ int main( int argc, char* args[] )
 	int jump_height = 0;
 	int max_jump_height = 150;
 	int mario_yVel= 0;
+	int didShamrockCollide = 0;
 	//Start up SDL and create window
 	if( !init() )
 	{
@@ -555,6 +575,16 @@ int main( int argc, char* args[] )
 				SDL_Rect* potOfGold = &gGoldLocation;
 				gGold.render(1670- gMapLocation.x, 330, potOfGold);
 				isPotCollide(1670- gMapLocation.x, mario_xcoord, 330, mario_ycoord + 27);
+
+				//Render shamrock
+				if(!(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 431) && didShamrockCollide == 0 ){
+					SDL_Rect * shamrock = &gShamrockLocation;
+					gShamrock.render(1228 - gMapLocation.x, 395, shamrock);
+				} //render only if mario doesn't collide
+
+				if(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 431)
+						didShamrockCollide = 1;
+					
 				//cout<< "Pot loc x: " << 1670- gMapLocation.x <<endl;
 				//cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
 				// update jumping

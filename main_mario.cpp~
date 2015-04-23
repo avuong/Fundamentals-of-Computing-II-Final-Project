@@ -315,10 +315,10 @@ bool isBrick_down(int xloc, int yloc)
 {
 	int x_coord = xloc/BRICK_HEIGHT;
 	int x_remainder = xloc % BRICK_HEIGHT;
-	int y_coord = (yloc + LEP_HEIGHT - 3) / BRICK_HEIGHT;
+	int y_coord = (yloc + LEP_HEIGHT - 1) / BRICK_HEIGHT;
 	int y_remainder = (yloc + LEP_HEIGHT) % BRICK_HEIGHT;
 
-	if (gBrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH - 5) {
+	if (gBrickCoordinates[y_coord][x_coord] == 1/* && x_remainder < LEP_WIDTH - 2*/) {
 		return true;
 	}
 	else {
@@ -335,10 +335,10 @@ bool isBrick_up(int xloc, int yloc)
 {
 	int x_coord = xloc/BRICK_HEIGHT;
 	int x_remainder = xloc % BRICK_HEIGHT;
-	int y_coord = (yloc + 4) / BRICK_HEIGHT;
+	int y_coord = (yloc - 32) / BRICK_HEIGHT;
 	int y_remainder = (yloc) % BRICK_HEIGHT;
 
-	if (gBrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH - 5) {
+	if (gBrickCoordinates[y_coord][x_coord] == 1 /*&& x_remainder < LEP_WIDTH - 5*/) {
 		return true;
 	}
 	else {
@@ -353,9 +353,9 @@ bool isBrick_up(int xloc, int yloc)
 
 bool isBrick_right(int xloc, int yloc)
 {
-	int x_coord = (xloc + LEP_WIDTH + 2) / BRICK_HEIGHT;
+	int x_coord = (xloc + LEP_WIDTH + 4) / BRICK_HEIGHT;
 	int x_remainder = (xloc + LEP_WIDTH) % BRICK_HEIGHT;
-	int y_coord = (yloc) / BRICK_HEIGHT;
+	int y_coord = (yloc + 4) / BRICK_HEIGHT;
 	int y_remainder = (yloc) % BRICK_HEIGHT;
 	if (gBrickCoordinates[y_coord][x_coord] == 1) {
 		return true;
@@ -369,9 +369,9 @@ bool isBrick_right(int xloc, int yloc)
 
 bool isBrick_left(int xloc, int yloc)
 {
-	int x_coord = (xloc) / BRICK_HEIGHT;
+	int x_coord = (xloc - 4) / BRICK_HEIGHT;
 	int x_remainder = (xloc) % BRICK_HEIGHT;
-	int y_coord = (yloc) / BRICK_HEIGHT;
+	int y_coord = (yloc + 4) / BRICK_HEIGHT;
 	int y_remainder = (yloc) % BRICK_HEIGHT;
 	if (gBrickCoordinates[y_coord][x_coord] == 1) {
 		return true;
@@ -402,12 +402,13 @@ int space_brick_up(int xloc, int yloc)
 	do					
 	{
 	++brick_space;
-	if (yloc - brick_space == 0) 
+	if (yloc - brick_space - 4 == 0) 
 		break;
 	} while (!isBrick_up(xloc, yloc - brick_space) ); 
 	
 	return brick_space;
 }
+
 
 void isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
 {
@@ -555,7 +556,7 @@ int main( int argc, char* args[] )
 				gGold.render(1670- gMapLocation.x, 330, potOfGold);
 				isPotCollide(1670- gMapLocation.x, mario_xcoord, 330, mario_ycoord + 27);
 				//cout<< "Pot loc x: " << 1670- gMapLocation.x <<endl;
-				//cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
+				cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
 				// update jumping
 				/*
 			   cout << "jump_height is " << jump_height << " mario down is " << mario_down << endl;
