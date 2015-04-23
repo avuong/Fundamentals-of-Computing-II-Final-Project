@@ -13,7 +13,7 @@ using namespace std;
 
 class Map {
 	public:
-		Map();
+		Map(string);
 		bool load_bricks();
 		void get_coordinates();
 		void render_Bricks(int);
@@ -36,25 +36,25 @@ class Map {
 		const int BRICK_WIDTH_h = 32;
 		const int LEP_HEIGHT_h = 45;
 		const int LEP_WIDTH_h = 27;
+		string file;
 };
 
-Map::Map()
+Map::Map(string f)
 {
-	if (!load_bricks())
-		throw invalid_argument("Could not load bricks");
+	file = f;
+	//if (!load_bricks())
+		//throw invalid_argument("Could not load bricks");
 	get_coordinates();
-	render_Bricks(0);
-	
+	//render_Bricks(0);
 }
 
 bool Map::load_bricks()
 {
 	bool success = true;
 	//Load sprite sheet texture
-	if( !Brick.loadFromFile( "brick.png", "green" ) )
+	if( !Brick.loadFromFile("brick.png", "green" ) )
 	{
-		
-		printf( "Failed to load walking animation texture!\n" );
+		cout << "failed to load " << file << endl;
 		success = false;
 	}
 	else
@@ -69,7 +69,6 @@ bool Map::load_bricks()
 void Map::get_coordinates()
 {
 	ifstream map_file;
-	string file = "bricks";
 	map_file.open(file.c_str());
 	vector<int> temp;
 	int num;

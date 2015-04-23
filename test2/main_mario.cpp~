@@ -66,13 +66,19 @@ SDL_Rect gMapLocation;
 LTexture gMap;
 
 // Brick Rendering
-Map level_one;
-Map level_two;
+string gfile1 = "bricks";
+string gfile2 = "bricks2";
+Map level_one(gfile1);
+Map level_two(gfile2);
 Map * levelPtr = &level_one;
 
 //Pot of Gold Rendering
 SDL_Rect gGoldLocation;
 LTexture gGold;
+
+//Level 2 Transition
+SDL_Rect gtransition_level2;
+LTexture gtransl2;
 
 string backgroundName = "background.png";
 bool init()
@@ -230,6 +236,20 @@ bool loadMedia()
 		gGoldLocation.w = 200;
 		gGoldLocation.h = 200;
 	}
+
+	//Load transition
+	if( !gtransl2.loadFromFile( "level2.png", "white" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gtransition_level2.x = 0;	
+		gtransition_level2.y = 0;
+		gtransition_level2.w = 500;
+		gtransition_level2.h = 500;
+	}
 	
 	return success;
 }
@@ -274,7 +294,7 @@ void isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
 }
 int main( int argc, char* args[] )
 {
-	level_one.get_coordinates();
+	levelPtr->get_coordinates();
 	usleep(10000);
 	int render_mario_yloc = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
 	int render_mario_xloc = SCREEN_WIDTH/2;
@@ -292,7 +312,10 @@ int main( int argc, char* args[] )
 	}
 	else
 	{
-		if (levelPtr->load_bricks() );
+		if (!levelPtr->load_bricks() )
+		{
+			printf("failed to load bricks map\n");
+		}
 		//Load media
 		if( !loadMedia() )
 		{
@@ -326,7 +349,7 @@ int main( int argc, char* args[] )
             const Uint8* currentKeyStates = SDL_GetKeyboardState( NULL );
 				if( currentKeyStates[ SDL_SCANCODE_UP ] )
 				{	
-					if(level_one.isBrick_down(mario_xcoord, mario_ycoord)){
+					if(levelPtr->isBrick_down(mario_xcoord, mario_ycoord)){
 						//mario_ycoord -= max_jump_height;
 					if (!jumping)
 					{
@@ -341,7 +364,7 @@ int main( int argc, char* args[] )
 				}
 				else if( currentKeyStates[ SDL_SCANCODE_LEFT ])
 				{
-					if ( gMapLocation.x > 2  && !level_one.isBrick_left(mario_xcoord, mario_ycoord) ) {
+					if ( gMapLocation.x > 2  && !levelPtr->isBrick_left(mario_xcoord, mario_ycoord) ) {
 						//if(isBrick(mario_xcoord, mario_ycoord) ) {
 							frame_left++;
 							gMapLocation.x -= 5;	
@@ -352,7 +375,7 @@ int main( int argc, char* args[] )
 				}
 				else if( currentKeyStates[ SDL_SCANCODE_RIGHT ])
 				{
-					if ( gMapLocation.x <  2000 - 500 && !level_one.isBrick_right(mario_xcoord, mario_ycoord) ) {
+					if ( gMapLocation.x <  2000 - 500 && !levelPtr->isBrick_right(mario_xcoord, mario_ycoord) ) {
 						//if (isBrick(mario_xcoord, mario_ycoord)) {
 							frame_right++;
 							gMapLocation.x += 5;		
@@ -364,8 +387,8 @@ int main( int argc, char* args[] )
 				}
 				if (jumping == true)
 				{
-					if (!level_one.isBrick_up(mario_xcoord, mario_ycoord)) {
-						int brick_space_up = level_one.space_brick_up(mario_xcoord, mario_ycoord);
+					if (!levelPtr->isBrick_up(mario_xcoord, mario_ycoord)) {
+						int brick_space_up = levelPtr->space_brick_up(mario_xcoord, mario_ycoord);
 						if (brick_space_up > 6)
 							mario_yVel -= 6;
 						else
@@ -392,7 +415,7 @@ int main( int argc, char* args[] )
 				gMap.render( 0, 0, currentMap );
 	
 				// Render Bricks on map
-				level_one.render_Bricks(gMapLocation.x);
+				levelPtr->render_Bricks(gMapLocation.x);
 				
 				//Render pot of Gold
 				SDL_Rect* potOfGold = &gGoldLocation;
@@ -416,8 +439,8 @@ int main( int argc, char* args[] )
 					jumping = false;
 					mario_down = false;
 				}*/
-				if (!level_one.isBrick_down(mario_xcoord, mario_ycoord)) {
-					int brick_space_down = level_one.space_brick_down(mario_xcoord, mario_ycoord);
+				if (!levelPtr->isBrick_down(mario_xcoord, mario_ycoord)) {
+					int brick_space_down = levelPtr->space_brick_down(mario_xcoord, mario_ycoord);
 					if (brick_space_down > 20)
 						mario_ycoord += 20;
 					else
@@ -447,8 +470,33 @@ int main( int argc, char* args[] )
 				{
 					frame_left = 0;
 				}
-				if ( SCREEN_HEIGHT - mario_ycoord <= 50)
-					quit = true;
+				// Transisiton to next level. NEED TO KNOW EXACT POINT OF gMapLocation.x
+				// ************************************************************
+				if ( SCREEN_HEIGHT - mario_ycoord <= 50 && gMapLocation.x > 1200) {
+					if (levelPtr == &level_one) {
+						gMapLocation.x = 0;
+						mario_xcoord = SCREEN_WIDTH/2;
+						mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
+						levelPtr = &level_two;
+						if (!levelPtr->load_bricks() ) quit = true;
+					}
+				//****************************************************************
+					else {
+						quit = true;
+					}
+					if (!quit) {
+						//Render current Map Frame
+						SDL_Rect* l2 = &gtransition_level2;
+						gtransl2.render( 0, 0, l2 );
+						//Update screen
+						SDL_RenderPresent( gRenderer );
+						do {
+							SDL_PollEvent(&e);
+						}
+						while( e.type == SDL_KEYUP );
+					}
+				}
+				if (SCREEN_HEIGHT - mario_ycoord <= 46) quit = true;
 			}
 		}
 	}

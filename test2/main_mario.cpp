@@ -66,13 +66,19 @@ SDL_Rect gMapLocation;
 LTexture gMap;
 
 // Brick Rendering
-Map level_one;
-Map level_two;
+string gfile1 = "bricks";
+string gfile2 = "bricks2";
+Map level_one(gfile1);
+Map level_two(gfile2);
 Map * levelPtr = &level_one;
 
 //Pot of Gold Rendering
 SDL_Rect gGoldLocation;
 LTexture gGold;
+
+//Level 2 Transition
+SDL_Rect gtransition_level2;
+LTexture gtransl2;
 
 string backgroundName = "background.png";
 bool init()
@@ -230,6 +236,20 @@ bool loadMedia()
 		gGoldLocation.w = 200;
 		gGoldLocation.h = 200;
 	}
+
+	//Load transition
+	if( !gtransl2.loadFromFile( "level2.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gtransition_level2.x = 0;	
+		gtransition_level2.y = 0;
+		gtransition_level2.w = 500;
+		gtransition_level2.h = 500;
+	}
 	
 	return success;
 }
@@ -292,7 +312,10 @@ int main( int argc, char* args[] )
 	}
 	else
 	{
-		if (levelPtr->load_bricks() );
+		if (!levelPtr->load_bricks() )
+		{
+			printf("failed to load bricks map\n");
+		}
 		//Load media
 		if( !loadMedia() )
 		{
@@ -447,8 +470,33 @@ int main( int argc, char* args[] )
 				{
 					frame_left = 0;
 				}
-				if ( SCREEN_HEIGHT - mario_ycoord <= 50)
-					quit = true;
+				// Transisiton to next level. NEED TO KNOW EXACT POINT OF gMapLocation.x
+				// ************************************************************
+				if ( SCREEN_HEIGHT - mario_ycoord <= 50 && gMapLocation.x > 1200) {
+					if (levelPtr == &level_one) {
+						gMapLocation.x = 0;
+						mario_xcoord = SCREEN_WIDTH/2;
+						mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
+						levelPtr = &level_two;
+						if (!levelPtr->load_bricks() ) quit = true;
+					}
+				//****************************************************************
+					else {
+						quit = true;
+					}
+					if (!quit) {
+						//Render current Map Frame
+						SDL_Rect* l2 = &gtransition_level2;
+						gtransl2.render( 0, 0, l2 );
+						//Update screen
+						SDL_RenderPresent( gRenderer );
+						do {
+							SDL_PollEvent(&e);
+						}
+						while( e.type == SDL_KEYUP );
+					}
+				}
+				if (SCREEN_HEIGHT - mario_ycoord <= 46) quit = true;
 			}
 		}
 	}
