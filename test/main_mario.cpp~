@@ -61,6 +61,7 @@ LTexture gRightSpriteTexture;
 SDL_Rect gLeftSprite[ WALKING_ANIMATION_FRAMES ];
 LTexture gLeftSpriteTexture;
 
+
 // Map rendering
 SDL_Rect gMapLocation;
 LTexture gMap;
@@ -79,6 +80,11 @@ LTexture gGold;
 //Level 2 Transition
 SDL_Rect gtransition_level2;
 LTexture gtransl2;
+
+//Shamrock Rendering
+SDL_Rect gShamrockLocation;
+LTexture gShamrock;
+
 
 string backgroundName = "background.png";
 bool init()
@@ -176,6 +182,7 @@ bool loadMedia()
 		gRightSprite[ 4 ].h = 43;
 	}
 
+
 	//Load sprite sheet texture going left
 	if( !gLeftSpriteTexture.loadFromFile( "left_lep.png", "white" ) )
 	{
@@ -237,6 +244,18 @@ bool loadMedia()
 		gGoldLocation.h = 200;
 	}
 
+	if( !gShamrock.loadFromFile( "shamrock.png", "white" ) ) 
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gShamrockLocation.x = 0;	
+		gShamrockLocation.y = 0;
+		gShamrockLocation.w = 48;
+		gShamrockLocation.h = 48;
+	}
 	//Load transition
 	if( !gtransl2.loadFromFile( "level2.png", "green" ) )
 	{
@@ -272,25 +291,12 @@ void close()
 }
 
 
-void isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
+int isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
 {
-	/*for(int i = potLocX; i < potLocX +200; i++){ //+200 because width of the pot of Gold
-		for(int j = spriteX; i < spriteX+27; j++){
-			if((i == j) && (potLocY==spriteY)){
-				cout<< "ON THE POT"<<endl;
-				return;
-			}
-			else{
-				cout<< "Not on the pot" <<endl;
-				return;
-			}
-		}
-	}
-	//cout<< "hello" <<endl;*/
-
-	if( spriteX - potLocX >= 1500 && spriteX - potLocX <= 1580 && spriteY >= 369){
-		cout<< "ON THE POT, you win" <<endl;
-	}
+	if( spriteX - potLocX >= 1500 && spriteX - potLocX <= 1580 && spriteY >= 369)
+		return 1;
+	else
+		return 0;
 }
 int main( int argc, char* args[] )
 {
@@ -305,7 +311,7 @@ int main( int argc, char* args[] )
 	int jump_height = 0;
 	int max_jump_height = 150;
 	int mario_yVel= 0;
-	//Start up SDL and create window
+	int didShamrockCollide = 0;
 	if( !init() )
 	{
 		printf( "Failed to initialize!\n" );
@@ -334,6 +340,9 @@ int main( int argc, char* args[] )
 			int frame_left = 0;
 			bool mario_right = true;
 
+			//Current enemy animation frame
+			//int enemy_frame_right = 0;
+			//int enemy_frame_left = 0;
 			//While application is running
 			while( !quit )
 			{
@@ -420,7 +429,15 @@ int main( int argc, char* args[] )
 				//Render pot of Gold
 				SDL_Rect* potOfGold = &gGoldLocation;
 				gGold.render(1670- gMapLocation.x, 330, potOfGold);
-				isPotCollide(1670- gMapLocation.x, mario_xcoord, 330, mario_ycoord + 27);
+
+				//Render shamrock
+				if(!(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 431) && didShamrockCollide == 0 ){
+					SDL_Rect * shamrock = &gShamrockLocation;
+					gShamrock.render(1228 - gMapLocation.x, 395, shamrock);
+				} //render only if mario doesn't collide
+
+				if(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 433)
+						didShamrockCollide = 1;
 				//cout<< "Pot loc x: " << 1670- gMapLocation.x <<endl;
 				//cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
 				// update jumping
@@ -454,6 +471,15 @@ int main( int argc, char* args[] )
 					SDL_Rect* currentClipLeft = &gLeftSprite[ frame_left / 5 ];
 					gLeftSpriteTexture.render( render_mario_xloc, mario_ycoord, currentClipLeft );
 				}
+
+				
+
+				//enemy_frame_right++;
+				//if(enemy_frame_right == 3) enemy_frame_right = 0 ;				
+				//if(enemy_xcoord < SCREEN_WIDTH/2 + 200) 
+				//	enemy_xcoord++;
+				//if(enemy_xcoord == SCREEN_WIDTH/2)
+				//	enemy_xcoord--;
 				//Update screen
 				SDL_RenderPresent( gRenderer );
 
@@ -470,9 +496,10 @@ int main( int argc, char* args[] )
 				{
 					frame_left = 0;
 				}
+
 				// Transisiton to next level. NEED TO KNOW EXACT POINT OF gMapLocation.x
 				// ************************************************************
-				if ( SCREEN_HEIGHT - mario_ycoord <= 50 && gMapLocation.x > 1200) {
+				if (isPotCollide(1670- gMapLocation.x, mario_xcoord, 330, mario_ycoord + 27)) {
 					if (levelPtr == &level_one) {
 						gMapLocation.x = 0;
 						mario_xcoord = SCREEN_WIDTH/2;

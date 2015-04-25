@@ -39,7 +39,7 @@ class Map {
 		string file;
 };
 
-Map::Map(string f, )
+Map::Map(string f)
 {
 	file = f;
 	//if (!load_bricks())
