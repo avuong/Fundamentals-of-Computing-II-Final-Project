@@ -421,7 +421,7 @@ int main( int argc, char* args[] )
 				gGold.render(1670- gMapLocation.x, 330, potOfGold);
 				isPotCollide(1670- gMapLocation.x, mario_xcoord, 330, mario_ycoord + 27);
 				//cout<< "Pot loc x: " << 1670- gMapLocation.x <<endl;
-				cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
+				//cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
 				// update jumping
 				/*
 			   cout << "jump_height is " << jump_height << " mario down is " << mario_down << endl;
