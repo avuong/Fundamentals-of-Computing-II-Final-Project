@@ -10,10 +10,10 @@ and may not be redistributed without written permission.*/
 #include <fstream>
 #include <vector>
 #include <iostream>
-//#include "Game.h"
-//#include "globalConstants.h"
+
 using namespace std;
 SDL_Renderer* gRenderer = NULL;
+
 class LTexture {
 	public:
 		//Initializes variables

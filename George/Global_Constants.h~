@@ -1,13 +1,9 @@
 #ifndef GLOBAL_CONSTANTS
 #define GLOBAL_CONSTANTS
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
 class Global_Constants {
 
 		public:
-			SDL_Renderer* gRenderer = NULL;
 		
 			//Screen dimension constants
 			const int SCREEN_WIDTH = 500;

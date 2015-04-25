@@ -10,10 +10,11 @@ and may not be redistributed without written permission.*/
 #include <fstream>
 #include <vector>
 #include <iostream>
+//#include "Game.h"
 #include "Global_Constants.h"
 using namespace std;
 //SDL_Renderer* gRenderer = NULL;
-class LTexture : public Global_Constants {
+class LTexture : public Global_Constants{
 	public:
 		//Initializes variables
 		LTexture();
@@ -42,7 +43,6 @@ class LTexture : public Global_Constants {
 		//Gets image dimensions
 		int getWidth();
 		int getHeight();
-		
 
 	private:
 		//The actual hardware texture
