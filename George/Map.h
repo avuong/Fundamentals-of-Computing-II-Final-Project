@@ -1,3 +1,6 @@
+#ifndef MAP_H
+#define MAP_H
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
@@ -29,6 +32,8 @@ class Map : public Global_Constants{
 		vector<vector<int> > BrickCoordinates;
 		string file;
 };
+
+#endif
 
 Map::Map() {}
 
