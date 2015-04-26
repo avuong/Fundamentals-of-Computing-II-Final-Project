@@ -23,8 +23,8 @@ const int X = 0;
 const int Y = 1;
 const int BRICK_HEIGHT = 32;
 const int BRICK_WIDTH = 32;
-const int LEP_HEIGHT = 45;
-const int LEP_WIDTH = 27;
+const int LEP_HEIGHT = 44;
+const int LEP_WIDTH = 25;
 
 //Key press surfaces constants
 enum KeyPressSurfaces
@@ -68,6 +68,15 @@ LTexture gRightSpriteTexture;
 SDL_Rect gLeftSprite[ WALKING_ANIMATION_FRAMES ];
 LTexture gLeftSpriteTexture;
 
+//Render Lives
+SDL_Rect gThreeLivesLocation;
+LTexture gThreeLives;
+
+SDL_Rect gTwoLivesLocation;
+LTexture gTwoLives;
+
+SDL_Rect gOneLifeLocation;
+LTexture gOneLife;
 
 // Map rendering
 SDL_Rect gMapLocation;
@@ -296,6 +305,46 @@ if( !gRightEnemyTexture.loadFromFile( "football_right.png", "white") )
 		gMapLocation.w = SCREEN_WIDTH;
 		gMapLocation.h = SCREEN_HEIGHT;
 	}	
+
+	//Load Life Sheets
+	if( !gThreeLives.loadFromFile( "threelives.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gThreeLivesLocation.x = 0;	
+		gThreeLivesLocation.y = 0;
+		gThreeLivesLocation.w = 204;
+		gThreeLivesLocation.h = 68;
+	}	
+
+	if( !gTwoLives.loadFromFile( "twolives.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gTwoLivesLocation.x = 0;	
+		gTwoLivesLocation.y = 0;
+		gTwoLivesLocation.w = 204;
+		gTwoLivesLocation.h = 68;
+	}	
+
+	if( !gOneLife.loadFromFile( "onelife.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gOneLifeLocation.x = 0;	
+		gOneLifeLocation.y = 0;
+		gOneLifeLocation.w = 204;
+		gOneLifeLocation.h = 68;
+	}
 	//Load sprite sheet texture
 	if( !gGold.loadFromFile( "gold.png", "white" ) )
 	{
@@ -386,6 +435,7 @@ int main( int argc, char* args[] )
 	int moveRight = 1;
 	int moveLeft = 0;
 	int movementCount = 0;
+	int lifeCount = 3;
 	if( !init() )
 	{
 		printf( "Failed to initialize!\n" );
@@ -504,6 +554,25 @@ int main( int argc, char* args[] )
 				//Render pot of Gold
 				SDL_Rect* potOfGold = &gGoldLocation;
 				gGold.render(1670- gMapLocation.x, 330, potOfGold);
+		
+				//Render lives
+				if(lifeCount ==3){
+					SDL_Rect* lifeCount = &gThreeLivesLocation;
+					gThreeLives.render(0, 0, lifeCount);
+				}
+				if(lifeCount ==2){
+					SDL_Rect* lifeCount = &gTwoLivesLocation;
+					gTwoLives.render(0,0, lifeCount);
+				}
+				if(lifeCount ==1){
+					SDL_Rect* lifeCount = &gOneLifeLocation;
+					gOneLife.render(0,0, lifeCount);
+				}
+				if(lifeCount ==0){
+					quit = true;
+				}
+
+				
 
 				//Render shamrock
 				if(!(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 431) && didShamrockCollide == 0 ){
@@ -511,8 +580,10 @@ int main( int argc, char* args[] )
 					gShamrock.render(1228 - gMapLocation.x, 395, shamrock);
 				} //render only if mario doesn't collide
 
-				if(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 433)
+				if(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 433 && didShamrockCollide == 0){
 						didShamrockCollide = 1;
+						lifeCount++;
+				}
 				//cout<< "Pot loc x: " << 1670- gMapLocation.x <<endl;
 				//cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
 				
@@ -611,7 +682,13 @@ int main( int argc, char* args[] )
 				}
 				
 				if(marioDead==1 && mario_ycoord < 500){
-					mario_ycoord+=7;
+						if (levelPtr == &level_one) {
+						gMapLocation.x = 0;
+						mario_xcoord = SCREEN_WIDTH/2;
+						mario_ycoord = 0;
+						marioDead=0;
+						lifeCount--;
+						}
 				}
 
 				//***************************************************************************************
@@ -666,7 +743,22 @@ int main( int argc, char* args[] )
 						while( e.type == SDL_KEYUP );
 					}
 				}
-				if (SCREEN_HEIGHT - mario_ycoord <= 46) quit = true;
+				if (SCREEN_HEIGHT - mario_ycoord <= 46){
+					if (levelPtr == &level_one) {
+						gMapLocation.x = 0;
+						mario_xcoord = SCREEN_WIDTH/2;
+						mario_ycoord = 0;
+						marioDead=0;
+						lifeCount--;
+					}
+					if (levelPtr == &level_two) {
+						gMapLocation.x = 0;
+						mario_xcoord = SCREEN_WIDTH/2;
+						mario_ycoord = 0;
+						levelPtr = &level_two;
+						lifeCount--;
+					}
+				}
 			}
 		}
 	}
