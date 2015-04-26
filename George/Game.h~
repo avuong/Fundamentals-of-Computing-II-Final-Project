@@ -61,8 +61,6 @@ class Game : public Global_Constants {
 		LTexture gShamrock;
 
 		// Brick Rendering
-		string gfile1 = "bricks";
-		string gfile2 = "bricks2";
 		Map level_one;
 		Map level_two;
 		Map * levelPtr;
@@ -322,15 +320,36 @@ void Game::play()
 	int jump_height = 0;
 	int max_jump_height = 150;
 	int mario_yVel= 0;
-
-
+	int num_players = 4;
+	vector<Football *> map1Players(num_players);
+	vector<Football *> map2Players(num_players);
 	if( !init() )
 	{
 		printf( "Failed to initialize!\n" );
 	}
 	else
 	{
-		Football player(300, 300, 50,40);
+		cout << "3\n";
+		Football player1(10,2,1);
+		Football player2(29,8,1);
+		Football player3(25,6,1);
+		Football player4(39,4,1);
+
+		Football player1a(37,1,2);
+		Football player2a(17,4,2);
+		Football player3a(25,6,2);
+		Football player4a(39,4,2);
+
+		map1Players[0] = &player1;
+		map1Players[1] = &player2;
+		map1Players[2] = &player3;
+		map1Players[3] = &player4;
+	
+		map2Players[0] = &player1a;
+		map2Players[1] = &player2a;
+		map2Players[2] = &player3a;
+		map2Players[3] = &player4a;
+		
 		if (!levelPtr->load_bricks() )
 		{
 			printf("failed to load bricks map\n");
@@ -406,19 +425,21 @@ void Game::play()
 				}
 				if (jumping == true)
 				{
-					if (!levelPtr->isBrick_up(mario_xcoord, mario_ycoord)) {
-						int brick_space_up = levelPtr->space_brick_up(mario_xcoord, mario_ycoord);
-						if (brick_space_up > 6)
+					if (!levelPtr->isBrick_up(mario_xcoord, mario_ycoord, mario_yVel)) {
+					//	int brick_space_up = levelPtr->space_brick_up(mario_xcoord, mario_ycoord, mario_yVel);
+						//if (brick_space_up > 6)
 							mario_yVel -= 6;
-						else
-							mario_yVel -= brick_space_up;
+					//	else
+						//	mario_yVel -= brick_space_up;
 					mario_ycoord = mario_ycoord + mario_yVel;
 					}
 					else {
-						mario_yVel = -60;
-						jumping = false;
+						int brick_space_up = levelPtr->space_brick_up(mario_xcoord, mario_ycoord, 0);
+						cout << brick_space_up << endl;
+						mario_yVel = -1*brick_space_up;
+						mario_ycoord = mario_ycoord + mario_yVel - 20;
 					}
-					if (mario_yVel == -60)
+					if (mario_yVel <= -60)
 					{
 						mario_yVel = 0;
 						//mario_yVel += 60;
@@ -482,8 +503,21 @@ void Game::play()
 					SDL_Rect* currentClipLeft = &gLeftSprite[ frame_left % 5 ];
 					gLeftSpriteTexture.render( render_mario_xloc, mario_ycoord, currentClipLeft );
 				}
-					// render enemy
-				player.render_enemy(true);
+				// render enemies on map
+			//	map1Players[0]->render_enemy(gMapLocation.x);
+
+				if (levelPtr == &level_one) {
+					for (int j = 0; j < num_players; j++) {
+						map1Players[j]->render_enemy(gMapLocation.x);
+					}
+				}
+				else {
+					for (int j = 0; j < num_players; j++) {
+						map2Players[j]->render_enemy(gMapLocation.x);
+					}
+				}
+
+			//	player1.render_enemy(gMapLocation.x);
 				//Update screen
 				SDL_RenderPresent( gRenderer );
 

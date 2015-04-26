@@ -1,5 +1,5 @@
-//#ifndef MAP_H
-//#define MAP_H
+#ifndef MAP_H
+#define MAP_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -20,25 +20,34 @@ class Map : public Global_Constants{
 		void get_coordinates();
 		void render_Bricks(int);
 		bool isBrick_down(int, int);
-		bool isBrick_up(int, int);
+		bool isBrick_up(int, int, int);
 		bool isBrick_right(int, int);
 		bool isBrick_left(int, int);
 		int space_brick_down(int, int);
-		int space_brick_up(int, int);
+		int space_brick_up(int, int, int);
+		int get_BrickLocation(int, int);
 		// Brick Rendering
 		SDL_Rect BrickLocation;
 		LTexture Brick;
-	private:
 		vector<vector<int> > BrickCoordinates;
+	protected:
+		//vector<vector<int> > BrickCoordinates;
 		string file;
+		int gMapLocation_x;
 };
 
-//#endif
+#endif
 
-Map::Map() {}
+Map::Map() 
+{
+	//cout << "map constructor called before\n";
+	get_coordinates();
+	//cout << "map constructor called after\n";
+}
 
 Map::Map(string f)
 {
+	//cout << "map constructor called before\n";
 	file = f;
 	//if (!load_bricks())
 		//throw invalid_argument("Could not load bricks");
@@ -72,6 +81,10 @@ void Map::get_coordinates()
 	int num;
 	while (!map_file.eof()) {
 		map_file >> num;
+		if (num == -1) {
+			BrickCoordinates.push_back(temp);
+			break;
+		}
 		if (num != 2)
 			temp.push_back(num);
 		else {
@@ -80,13 +93,14 @@ void Map::get_coordinates()
 		}
 	}
 }
-void Map::render_Bricks(int gMapLocation_x)
+void Map::render_Bricks(int gLocation_x)
 {
 	//Render current Map Frame
 	SDL_Rect* currentMap = &BrickLocation;
 	int location[2];
 	location[X] = 0;
 	location[Y] = 0;
+	gMapLocation_x = gLocation_x;
 	
 	for (int i = 0; i < BrickCoordinates.size(); i++) {
 		location[Y] = i*32;
@@ -125,13 +139,13 @@ bool Map::isBrick_down(int xloc, int yloc)
 	return false;
 }
 
-bool Map::isBrick_up(int xloc, int yloc)
+bool Map::isBrick_up(int xloc, int yloc, int yVel)
 {
 	int x_coord = xloc/BRICK_HEIGHT;
 	int x_remainder = xloc % BRICK_HEIGHT;
-	int y_coord = (yloc + 4) / BRICK_HEIGHT;
+	int y_coord = (yloc + yVel - 6) / BRICK_HEIGHT;
 	int y_remainder = (yloc) % BRICK_HEIGHT;
-
+	//cout << "ycoord" << " " << y_coord << " " << yloc << endl;
 	if (BrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH- 5) {
 		return true;
 	}
@@ -190,7 +204,7 @@ int Map::space_brick_down(int xloc, int yloc)
 	return brick_space;
 }
 
-int Map::space_brick_up(int xloc, int yloc)
+int Map::space_brick_up(int xloc, int yloc, int yVel)
 {
 	int brick_space = 0;
 	do					
@@ -198,7 +212,12 @@ int Map::space_brick_up(int xloc, int yloc)
 	++brick_space;
 	if (yloc - brick_space == 0) 
 		break;
-	} while (!isBrick_up(xloc, yloc - brick_space) ); 
-	
+	} while (!isBrick_up(xloc, yloc - brick_space, 0) ); 
+	cout << brick_space << endl;
 	return brick_space;
+}
+
+int Map::get_BrickLocation(int x, int y)
+{
+	return BrickCoordinates[y/BRICK_WIDTH][x/BRICK_HEIGHT];
 }

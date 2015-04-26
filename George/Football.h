@@ -8,20 +8,22 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
-#include "Global_Constants.h"
+//#include "Game.h"
 
 using namespace std;
 
 class Football : public Global_Constants {
 	public:
-		Football(int, int, int, int);
+		Football();
+		Football(int, int, int);
 		~Football();
 		virtual bool load_enemy();
 		virtual bool check_right(int, int);
 		virtual bool check_left(int, int);
 		virtual bool check_up(int, int);
 		virtual void setxCoord(int);
-		virtual void render_enemy(bool);
+		virtual void render_enemy(int);
+		void check_bricks();
       LTexture gRightEnemyTexture;
 		SDL_Rect gRightEnemy[5];
 		LTexture gLeftEnemyTexture;
@@ -31,6 +33,13 @@ class Football : public Global_Constants {
 		int f_y;
 		int f_h;
 		int f_w;
+		Map level1;
+		Map level2;
+		Map * mapPtr;
+		int level;
+		int right_step;
+		int left_step;
+		bool render_right = true;
 };
 
 #endif
@@ -39,17 +48,34 @@ class Football : public Global_Constants {
 static int right_frame = 0;
 static int left_frame = 0;
 
+
+Football::Football() {}
+
 // Call Football constructor and inherit from Enemy
-Football::Football(int xf, int yf, int wf, int hf)
+Football::Football(int xf, int yf, int num_map)
+	: level1(gfile1), level2(gfile2)
 {
+	cout << "here\n";
+	right_step = 2;
+	left_step = 2;
+	level = num_map;
+	f_x = BRICK_WIDTH * xf;
+	f_y = SCREEN_HEIGHT - yf*BRICK_HEIGHT - FOOTBALL_HEIGHT;
+		cout << "here332\n";
+	cout << "here22\n";
+	if (level == 1)
+		mapPtr = &level1;
+	else
+		mapPtr = &level2;
+	check_bricks();
 	if (!load_enemy())
 		throw invalid_argument("Failed to Load football");
-	f_x = xf;
-	f_y = yf;
-	f_h = hf;
-	f_w = wf;
-	//gRightEnemy = new SDL_Rect[5];
-	//gLeftEnemy = new SDL_Rect[5];
+	if (mapPtr->get_BrickLocation(f_x,f_y + FOOTBALL_HEIGHT) == 0 || !render_right) {
+		cout << "For " << xf << " and " << yf << endl;
+		cout << "For " << f_x << " and " << f_y << endl;
+		if (!render_right) cout << "cant render right\n";
+		throw invalid_argument("Footaball player must be placed on a brick");
+	}
 }
 
 Football::~Football()
@@ -155,21 +181,62 @@ void Football::setxCoord(int x)
 	f_x = x;
 }
 
-void Football::render_enemy(bool render_right)
+void Football::render_enemy(int gMapLocation_x)
 {
-	cout << right_frame << endl;
+	check_bricks();
 	if (right_frame > 16) right_frame = 0;
 	if (left_frame > 16) left_frame = 0;
 	if (render_right) {
+		f_x += right_step;
 		SDL_Rect* currentEnemy = &gRightEnemy[right_frame % 4];
-		gRightEnemyTexture.render(200, 200, currentEnemy);
+		gRightEnemyTexture.render(f_x - gMapLocation_x, f_y, currentEnemy);
 		++right_frame;
 	}
 	else {
+		f_x -= left_step;
 		SDL_Rect* currentEnemy = &gLeftEnemy[left_frame % 4];
-		gLeftEnemyTexture.render( 100, 100, currentEnemy);
+		gLeftEnemyTexture.render( f_x - gMapLocation_x, f_y, currentEnemy);
 		++left_frame;
 	}
 }	
 
-
+void Football::check_bricks()
+{
+	//cout << mapPtr->get_BrickLocation(f_x + right_step + FOOTBALL_WIDTH,f_y + FOOTBALL_HEIGHT) << endl;
+	// Check if brick on enemy bottom right
+	if (mapPtr->get_BrickLocation(f_x + right_step + FOOTBALL_WIDTH,f_y + FOOTBALL_HEIGHT) == 0) {
+		//cout << "1\n";
+		render_right = false;
+		return;
+	}
+	// Check if brick on enemy bottom left
+	if (mapPtr->get_BrickLocation(f_x - left_step,f_y + FOOTBALL_HEIGHT) == 0) {
+		//cout << "2\n";
+		render_right = true;
+		return;
+	}
+	// Check if brick on enemy right up
+	if (mapPtr->get_BrickLocation(f_x + right_step + FOOTBALL_WIDTH,f_y) == 1) {
+		//		cout << "3\n";
+		render_right = false;
+		return;
+	}	
+	// Check if brick on enemy left up
+	if (mapPtr->get_BrickLocation(f_x - left_step,f_y) == 1) {
+		//cout << "4\n";
+		render_right = true;
+		return;
+	}
+	// Check if brick on enemy right midlevel
+	if (mapPtr->get_BrickLocation(f_x + right_step + FOOTBALL_WIDTH,f_y + BRICK_HEIGHT) == 1) {
+		//cout << "5\n";
+		render_right = false;
+		return;
+	}	
+	// Check if brick on enemy left midlevel
+	if (mapPtr->get_BrickLocation(f_x - left_step,f_y + BRICK_HEIGHT) == 1) {
+		//cout << "6\n";
+		render_right = true;
+		return;
+	}
+}
