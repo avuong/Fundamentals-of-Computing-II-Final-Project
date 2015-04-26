@@ -14,6 +14,10 @@ class Global_Constants {
 			const int BRICK_WIDTH = 32;
 			const int LEP_HEIGHT = 45;
 			const int LEP_WIDTH = 27;
+			const int FOOTBALL_WIDTH = 49;
+			const int FOOTBALL_HEIGHT = 51;
+			const string gfile1 = "bricks";
+			const string gfile2 = "bricks2";
 
 			//Key press surfaces constants
 			enum KeyPressSurfaces
