@@ -485,7 +485,8 @@ int main( int argc, char* args[] )
 					if (mario_yVel == -60)
 					{
 						mario_yVel = 0;
-						//mario_yVel += 60;
+						
+//mario_yVel += 60;
 						jumping = false;
 					}
 				}
@@ -558,10 +559,10 @@ int main( int argc, char* args[] )
 				}
 
 				movementCount++;
-				cout<< mario_ycoord+ 40 << " " <<enemy_ycoord<<endl;
+				//cout<< mario_ycoord+ 44 << " " <<enemy_ycoord<<endl;
 				//COLLISION IN THE WORKS for football player
 				//********************************************************************************
-				if((mario_ycoord+ 40 - enemy_ycoord > 0  && enemy_xcoord - (mario_xcoord + 23) < 0 && enemy_xcoord - (mario_xcoord + 23) > -38) && !((enemy_ycoord - mario_ycoord) < 3)|| (mario_ycoord + 40 - enemy_ycoord > 0 && (enemy_xcoord + 46) - (mario_xcoord) > 0 && enemy_xcoord - (mario_xcoord + 23) < -46)&& !((enemy_ycoord - mario_ycoord) < 3)){
+				/*if((mario_ycoord+ 40 - enemy_ycoord > 0  && enemy_xcoord - (mario_xcoord + 23) < 0 && enemy_xcoord - (mario_xcoord + 23) > -38) && !((enemy_ycoord - mario_ycoord) < 3)|| (mario_ycoord + 40 - enemy_ycoord > 0 && (enemy_xcoord + 46) - (mario_xcoord) > 0 && enemy_xcoord - (mario_xcoord + 23) < -46)&& !((enemy_ycoord - mario_ycoord) < 3)){
 				cout<< "attacked from top: kill"<<endl;
 				enemyDead = 1;
 				}
@@ -577,10 +578,36 @@ int main( int argc, char* args[] )
 					cout<< "mario collides facing left:DIES"<<endl;
 					marioDead = 1;
 					}
+				} */ //older collission detection
+
+				//mario_xcoord + 25 = mario's x coord + his width
+				//enemy_xcoord + 34 = enemy's x coord + his width
+				//mario_y coord +44 = mario's bottom (his y + his height)
+				//enemy_ycoord + 10 = around the enemies head area
+				if(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord + LEP_HEIGHT) > enemy_ycoord+10 && !((enemy_ycoord - mario_ycoord) < 3)){
+				cout<< "attacked from top: kill"<<endl;    
+					enemyDead = 1;
+					mario_ycoord = mario_ycoord - 85;
 				}
+				if(!(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > enemy_ycoord+10 && !((enemy_ycoord - mario_ycoord) < 3))){
+					if(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > enemy_ycoord+10){
+						cout<< "Mario has collided while facing right :DIES" <<endl;
+						marioDead = 1;
+					}
+				}
+		
+				/*if(enemy_xcoord - (mario_xcoord+25) < 0 && (enemy_xcoord+34) -(mario_xcoord +25) > -34 && (mario_ycoord +44) > enemy_ycoord+10){
+					cout<< "collision : mario dies"  << endl;
+					//quit = true;
+				} 
+				
+				if(enemy_xcoord - (mario_xcoord+25) < 0 && (enemy_xcoord+34) -(mario_xcoord +25) > -34 && (mario_ycoord +44) < enemy_ycoord+2){
+					cout<< "mario kills" <<endl;
+					quit = true;
+				}*/
 
 				if(enemyDead==1 && enemy_ycoord < 500){
-					enemy_ycoord+=7; //make the enemy fall off the screen
+					enemy_ycoord+=10; //make the enemy fall off the screen
 				}
 				
 				if(marioDead==1 && mario_ycoord < 500){
