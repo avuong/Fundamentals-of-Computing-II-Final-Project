@@ -23,8 +23,8 @@ const int X = 0;
 const int Y = 1;
 const int BRICK_HEIGHT = 32;
 const int BRICK_WIDTH = 32;
-const int LEP_HEIGHT = 45;
-const int LEP_WIDTH = 27;
+const int LEP_HEIGHT = 44;
+const int LEP_WIDTH = 25;
 
 //Key press surfaces constants
 enum KeyPressSurfaces
@@ -36,6 +36,13 @@ enum KeyPressSurfaces
     KEY_PRESS_SURFACE_RIGHT,
     KEY_PRESS_SURFACE_TOTAL
 };
+
+const int ENEMY_WALKING_FRAMES = 4;
+SDL_Rect gRightEnemy[ENEMY_WALKING_FRAMES];
+LTexture gRightEnemyTexture;
+
+SDL_Rect gLeftEnemy[ENEMY_WALKING_FRAMES];
+LTexture gLeftEnemyTexture;
 
 //Texture wrapper class
 
@@ -61,6 +68,15 @@ LTexture gRightSpriteTexture;
 SDL_Rect gLeftSprite[ WALKING_ANIMATION_FRAMES ];
 LTexture gLeftSpriteTexture;
 
+//Render Lives
+SDL_Rect gThreeLivesLocation;
+LTexture gThreeLives;
+
+SDL_Rect gTwoLivesLocation;
+LTexture gTwoLives;
+
+SDL_Rect gOneLifeLocation;
+LTexture gOneLife;
 
 // Map rendering
 SDL_Rect gMapLocation;
@@ -217,6 +233,65 @@ bool loadMedia()
 		gLeftSprite[ 4 ].w = 27;
 		gLeftSprite[ 4 ].h = 43;
 	}
+
+if( !gRightEnemyTexture.loadFromFile( "football_right.png", "white") )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		//Set sprite clips
+		gRightEnemy[ 0 ].x = 2;
+		gRightEnemy[ 0 ].y = 0;
+		gRightEnemy[ 0 ].w = 34;
+		gRightEnemy[ 0 ].h = 51;
+
+		gRightEnemy[ 1 ].x =  53;
+		gRightEnemy[ 1 ].y =  0;
+		gRightEnemy[ 1 ].w =  87 - 53;
+		gRightEnemy[ 1 ].h = 51;
+		
+		gRightEnemy[ 2 ].x = 100;
+		gRightEnemy[ 2 ].y = 0;
+		gRightEnemy[ 2 ].w = 134 - 100;
+		gRightEnemy[ 2 ].h = 51;
+
+		gRightEnemy[ 3 ].x = 152;
+		gRightEnemy[ 3 ].y = 0;
+		gRightEnemy[ 3 ].w = 185 - 152;
+		gRightEnemy[ 3 ].h = 51;
+	}
+
+	if( !gLeftEnemyTexture.loadFromFile( "football_left.png", "white") )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		//Set sprite clips
+		gLeftEnemy[ 0 ].x = 7;
+		gLeftEnemy[ 0 ].y = 0;
+		gLeftEnemy[ 0 ].w =  41-7;
+		gLeftEnemy[ 0 ].h = 50;
+
+		gLeftEnemy[ 1 ].x =  54;
+		gLeftEnemy[ 1 ].y =  0;
+		gLeftEnemy[ 1 ].w =  89 - 54;
+		gLeftEnemy[ 1 ].h = 50;
+		
+		gLeftEnemy[ 2 ].x = 103;
+		gLeftEnemy[ 2 ].y = 0;
+		gLeftEnemy[ 2 ].w = 138 - 103;
+		gLeftEnemy[ 2 ].h = 50;
+
+		gLeftEnemy[ 3 ].x = 152;
+		gLeftEnemy[ 3 ].y = 0;
+		gLeftEnemy[ 3 ].w = 186 - 152;
+		gLeftEnemy[ 3 ].h = 50;
+	}
+
 	//Load sprite sheet texture
 	if( !gMap.loadFromFile( backgroundName.c_str(), "white" ) )
 	{
@@ -230,6 +305,46 @@ bool loadMedia()
 		gMapLocation.w = SCREEN_WIDTH;
 		gMapLocation.h = SCREEN_HEIGHT;
 	}	
+
+	//Load Life Sheets
+	if( !gThreeLives.loadFromFile( "threelives.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gThreeLivesLocation.x = 0;	
+		gThreeLivesLocation.y = 0;
+		gThreeLivesLocation.w = 204;
+		gThreeLivesLocation.h = 68;
+	}	
+
+	if( !gTwoLives.loadFromFile( "twolives.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gTwoLivesLocation.x = 0;	
+		gTwoLivesLocation.y = 0;
+		gTwoLivesLocation.w = 204;
+		gTwoLivesLocation.h = 68;
+	}	
+
+	if( !gOneLife.loadFromFile( "onelife.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gOneLifeLocation.x = 0;	
+		gOneLifeLocation.y = 0;
+		gOneLifeLocation.w = 204;
+		gOneLifeLocation.h = 68;
+	}
 	//Load sprite sheet texture
 	if( !gGold.loadFromFile( "gold.png", "white" ) )
 	{
@@ -312,6 +427,15 @@ int main( int argc, char* args[] )
 	int max_jump_height = 150;
 	int mario_yVel= 0;
 	int didShamrockCollide = 0;
+	int enemy_xcoord = SCREEN_WIDTH/2 + 50;
+	int enemy_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT)-7;
+	int enemy_frame_right = 0;
+	int enemyDead = 0;
+	int marioDead = 0;
+	int moveRight = 1;
+	int moveLeft = 0;
+	int movementCount = 0;
+	int lifeCount = 3;
 	if( !init() )
 	{
 		printf( "Failed to initialize!\n" );
@@ -411,7 +535,8 @@ int main( int argc, char* args[] )
 					if (mario_yVel == -60)
 					{
 						mario_yVel = 0;
-						//mario_yVel += 60;
+						
+//mario_yVel += 60;
 						jumping = false;
 					}
 				}
@@ -429,6 +554,25 @@ int main( int argc, char* args[] )
 				//Render pot of Gold
 				SDL_Rect* potOfGold = &gGoldLocation;
 				gGold.render(1670- gMapLocation.x, 330, potOfGold);
+		
+				//Render lives
+				if(lifeCount ==3){
+					SDL_Rect* lifeCount = &gThreeLivesLocation;
+					gThreeLives.render(0, 0, lifeCount);
+				}
+				if(lifeCount ==2){
+					SDL_Rect* lifeCount = &gTwoLivesLocation;
+					gTwoLives.render(0,0, lifeCount);
+				}
+				if(lifeCount ==1){
+					SDL_Rect* lifeCount = &gOneLifeLocation;
+					gOneLife.render(0,0, lifeCount);
+				}
+				if(lifeCount ==0){
+					quit = true;
+				}
+
+				
 
 				//Render shamrock
 				if(!(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 431) && didShamrockCollide == 0 ){
@@ -436,26 +580,14 @@ int main( int argc, char* args[] )
 					gShamrock.render(1228 - gMapLocation.x, 395, shamrock);
 				} //render only if mario doesn't collide
 
-				if(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 433)
+				if(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 433 && didShamrockCollide == 0){
 						didShamrockCollide = 1;
+						lifeCount++;
+				}
 				//cout<< "Pot loc x: " << 1670- gMapLocation.x <<endl;
 				//cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
-				// update jumping
-				/*
-			   cout << "jump_height is " << jump_height << " mario down is " << mario_down << endl;
-				if (jumping && jump_height < max_jump_height && !mario_down) {
-					mario_ycoord -= 10;
-					jump_height += 10;
-				}
-				if (jumping && (jump_height >= max_jump_height || mario_down) ) {
-					mario_ycoord += 10;
-					jump_height -= 10;
-					mario_down = true;
-				}
-				if (jumping && mario_down && jump_height == 0) {
-					jumping = false;
-					mario_down = false;
-				}*/
+				
+
 				if (!levelPtr->isBrick_down(mario_xcoord, mario_ycoord)) {
 					int brick_space_down = levelPtr->space_brick_down(mario_xcoord, mario_ycoord);
 					if (brick_space_down > 20)
@@ -469,13 +601,101 @@ int main( int argc, char* args[] )
 				}
 				else {
 					SDL_Rect* currentClipLeft = &gLeftSprite[ frame_left / 5 ];
-					gLeftSpriteTexture.render( render_mario_xloc, mario_ycoord, currentClipLeft );
+					gLeftSpriteTexture.render( render_mario_xloc , mario_ycoord, currentClipLeft );
 				}
 
-				
 
-				//enemy_frame_right++;
-				//if(enemy_frame_right == 3) enemy_frame_right = 0 ;				
+				//Movement of enemy
+				//*******************************************
+				if(moveRight==1){
+					enemy_xcoord++;
+					SDL_Rect* enemyCurrentClip = &gRightEnemy[enemy_frame_right];
+					gRightEnemyTexture.render(enemy_xcoord - gMapLocation.x, enemy_ycoord, enemyCurrentClip);
+					if(movementCount==70){
+						moveRight = 0;
+						moveLeft = 1;
+						movementCount = 0;
+					}
+				}
+	
+				if(moveLeft==1){
+					enemy_xcoord--;
+					SDL_Rect* enemyCurrentClip = &gLeftEnemy[enemy_frame_right];
+					gLeftEnemyTexture.render(enemy_xcoord - gMapLocation.x, enemy_ycoord, enemyCurrentClip);
+					if(movementCount==70){
+						moveRight = 1;
+						moveLeft = 0;
+						movementCount = 0;
+					}
+				}
+
+				movementCount++;
+				//cout<< mario_ycoord+ 44 << " " <<enemy_ycoord<<endl;
+				//COLLISION IN THE WORKS for football player
+				//********************************************************************************
+				/*if((mario_ycoord+ 40 - enemy_ycoord > 0  && enemy_xcoord - (mario_xcoord + 23) < 0 && enemy_xcoord - (mario_xcoord + 23) > -38) && !((enemy_ycoord - mario_ycoord) < 3)|| (mario_ycoord + 40 - enemy_ycoord > 0 && (enemy_xcoord + 46) - (mario_xcoord) > 0 && enemy_xcoord - (mario_xcoord + 23) < -46)&& !((enemy_ycoord - mario_ycoord) < 3)){
+				cout<< "attacked from top: kill"<<endl;
+				enemyDead = 1;
+				}
+
+				if(mario_right){
+					if(enemy_xcoord - (mario_xcoord + 23) < 0 && enemy_xcoord - (mario_xcoord + 23) > -38 && (enemy_ycoord - mario_ycoord) < 3){
+						cout<< "Mario has collided while facing right :DIES" <<endl;
+						marioDead = 1;
+					}
+				}
+				else{
+					if((enemy_xcoord + 46) - (mario_xcoord) > 0 && enemy_xcoord - (mario_xcoord + 23) < -46 && (enemy_ycoord - mario_ycoord) < 3){
+					cout<< "mario collides facing left:DIES"<<endl;
+					marioDead = 1;
+					}
+				} */ //older collission detection
+
+				//mario_xcoord + 25 = mario's x coord + his width
+				//enemy_xcoord + 34 = enemy's x coord + his width
+				//mario_y coord +44 = mario's bottom (his y + his height)
+				//enemy_ycoord + 10 = around the enemies head area
+				if(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord + LEP_HEIGHT) > enemy_ycoord+10 && !((enemy_ycoord - mario_ycoord) < 3)){
+				cout<< "attacked from top: kill"<<endl;    
+					enemyDead = 1;
+					mario_ycoord = mario_ycoord - 85;
+				}
+				if(!(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > enemy_ycoord+10 && !((enemy_ycoord - mario_ycoord) < 3))){
+					if(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > enemy_ycoord+10){
+						cout<< "Mario has collided while facing right :DIES" <<endl;
+						marioDead = 1;
+					}
+				}
+		
+				/*if(enemy_xcoord - (mario_xcoord+25) < 0 && (enemy_xcoord+34) -(mario_xcoord +25) > -34 && (mario_ycoord +44) > enemy_ycoord+10){
+					cout<< "collision : mario dies"  << endl;
+					//quit = true;
+				} 
+				
+				if(enemy_xcoord - (mario_xcoord+25) < 0 && (enemy_xcoord+34) -(mario_xcoord +25) > -34 && (mario_ycoord +44) < enemy_ycoord+2){
+					cout<< "mario kills" <<endl;
+					quit = true;
+				}*/
+
+				if(enemyDead==1 && enemy_ycoord < 500){
+					enemy_ycoord+=10; //make the enemy fall off the screen
+				}
+				
+				if(marioDead==1 && mario_ycoord < 500){
+						if (levelPtr == &level_one) {
+						gMapLocation.x = 0;
+						mario_xcoord = SCREEN_WIDTH/2;
+						mario_ycoord = 0;
+						marioDead=0;
+						lifeCount--;
+						}
+				}
+
+				//***************************************************************************************
+				//cout<< "mario x " << mario_xcoord + 23 << " football x " << enemy_xcoord <<endl; 
+
+				enemy_frame_right++;
+				if(enemy_frame_right == 3) enemy_frame_right = 0 ;				
 				//if(enemy_xcoord < SCREEN_WIDTH/2 + 200) 
 				//	enemy_xcoord++;
 				//if(enemy_xcoord == SCREEN_WIDTH/2)
@@ -523,7 +743,22 @@ int main( int argc, char* args[] )
 						while( e.type == SDL_KEYUP );
 					}
 				}
-				if (SCREEN_HEIGHT - mario_ycoord <= 46) quit = true;
+				if (SCREEN_HEIGHT - mario_ycoord <= 46){
+					if (levelPtr == &level_one) {
+						gMapLocation.x = 0;
+						mario_xcoord = SCREEN_WIDTH/2;
+						mario_ycoord = 0;
+						marioDead=0;
+						lifeCount--;
+					}
+					if (levelPtr == &level_two) {
+						gMapLocation.x = 0;
+						mario_xcoord = SCREEN_WIDTH/2;
+						mario_ycoord = 0;
+						levelPtr = &level_two;
+						lifeCount--;
+					}
+				}
 			}
 		}
 	}
