@@ -72,6 +72,16 @@ class Game : public Global_Constants {
 		//Level 2 Transition
 		SDL_Rect gtransition_level2;
 		LTexture gtransl2;
+
+		//Render Lives
+		SDL_Rect gThreeLivesLocation;
+		LTexture gThreeLives;
+
+		SDL_Rect gTwoLivesLocation;
+		LTexture gTwoLives;
+
+		SDL_Rect gOneLifeLocation;
+		LTexture gOneLife;
 };
 
 #endif
@@ -101,6 +111,10 @@ Game::Game()
 		//Pot of Gold Rendering
 		SDL_Rect gGoldLocation;
 		LTexture gGold;
+
+		//Shamrock Rendering
+		SDL_Rect gShamrockLocation;
+		LTexture gShamrock;
 
 		//Level 2 Transition
 		SDL_Rect gtransition_level2;
@@ -296,6 +310,46 @@ bool Game::loadMedia()
 		gtransition_level2.w = 500;
 		gtransition_level2.h = 500;
 	}
+
+	//Load Life Sheets
+	if( !gThreeLives.loadFromFile( "threelives.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gThreeLivesLocation.x = 0;	
+		gThreeLivesLocation.y = 0;
+		gThreeLivesLocation.w = 204;
+		gThreeLivesLocation.h = 68;
+	}	
+
+	if( !gTwoLives.loadFromFile( "twolives.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gTwoLivesLocation.x = 0;	
+		gTwoLivesLocation.y = 0;
+		gTwoLivesLocation.w = 204;
+		gTwoLivesLocation.h = 68;
+	}	
+
+	if( !gOneLife.loadFromFile( "onelife.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gOneLifeLocation.x = 0;	
+		gOneLifeLocation.y = 0;
+		gOneLifeLocation.w = 204;
+		gOneLifeLocation.h = 68;
+	}
 	
 	return success;
 }
@@ -320,6 +374,8 @@ void Game::play()
 	int jump_height = 0;
 	int max_jump_height = 150;
 	int mario_yVel= 0;
+	int didShamrockCollide = 0;
+	int life_count = 3;
 	int num_players = 4;
 	vector<Football *> map1Players(num_players);
 	vector<Football *> map2Players(num_players);
@@ -349,7 +405,7 @@ void Game::play()
 		map2Players[1] = &player2a;
 		map2Players[2] = &player3a;
 		map2Players[3] = &player4a;
-		
+		cout << "4\n";
 		if (!levelPtr->load_bricks() )
 		{
 			printf("failed to load bricks map\n");
@@ -504,20 +560,75 @@ void Game::play()
 					SDL_Rect* currentClipLeft = &gLeftSprite[ frame_left % 5 ];
 					gLeftSpriteTexture.render( render_mario_xloc, mario_ycoord, currentClipLeft );
 				}
-				// render enemies on map
+			// render enemies on map
 			//	map1Players[0]->render_enemy(gMapLocation.x);
 
 				if (levelPtr == &level_one) {
 					for (int j = 0; j < num_players; j++) {
+						if (map1Players[j]->check_up(mario_xcoord, mario_ycoord) ){
+							cout << "true" << endl;
+							 mario_ycoord -= 85;
+						}
+						if(map1Players[j]->mario_die(mario_xcoord, mario_ycoord) ) {
+							
+								gMapLocation.x = 0;
+								mario_xcoord = SCREEN_WIDTH/2;
+								mario_ycoord = 200;
+								mario_yVel = 0;
+								life_count--;
+						}
 						map1Players[j]->render_enemy(gMapLocation.x);
 					}
 				}
 				else {
 					for (int j = 0; j < num_players; j++) {
+						if (map2Players[j]->check_up(mario_xcoord, mario_ycoord) ){
+							cout << "true" << endl;
+							mario_ycoord -= 85;
+						}
+						if(map2Players[j]->mario_die(mario_xcoord, mario_ycoord) ) {
+							
+								gMapLocation.x = 0;
+								mario_xcoord = SCREEN_WIDTH/2;
+								mario_ycoord = 200;
+								mario_yVel = 0;
+								life_count--;
+						}
 						map2Players[j]->render_enemy(gMapLocation.x);
 					}
 				}
 
+				//Render shamrock
+				if (life_count < 3) {
+				if(!(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 431) && didShamrockCollide == 0 ){
+					SDL_Rect * shamrock = &gShamrockLocation;
+					gShamrock.render(1228 - gMapLocation.x, 395, shamrock);
+				} //render only if mario doesn't collide
+
+				if(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 433 && didShamrockCollide == 0){
+						didShamrockCollide = 1;
+						life_count++;
+				}
+				}
+	
+				//Render lives
+				if(life_count ==3){
+					SDL_Rect* life_count = &gThreeLivesLocation;
+					gThreeLives.render(0, 0, life_count);
+				}
+				if(life_count ==2){
+					SDL_Rect* life_count = &gTwoLivesLocation;
+					gTwoLives.render(0,0, life_count);
+				}
+				if(life_count ==1){
+					SDL_Rect* life_count = &gOneLifeLocation;
+					gOneLife.render(0,0, life_count);
+				}
+				if(life_count ==0){
+					quit = true;
+				}
+
+		
 			//	player1.render_enemy(gMapLocation.x);
 				//Update screen
 				SDL_RenderPresent( gRenderer );
@@ -561,7 +672,20 @@ void Game::play()
 						while( e.type == SDL_KEYUP );
 					}
 				}
-				if (SCREEN_HEIGHT - mario_ycoord <= 46) quit = true;
+				if (SCREEN_HEIGHT - mario_ycoord <= 46){
+					if (levelPtr == &level_one) {
+						gMapLocation.x = 0;
+						mario_xcoord = SCREEN_WIDTH/2;
+						mario_ycoord = 0;
+						life_count--;
+					}
+					if (levelPtr == &level_two) {
+						gMapLocation.x = 0;
+						mario_xcoord = SCREEN_WIDTH/2;
+						mario_ycoord = 0;
+						life_count--;
+					}
+				}
 			}
 		}
 	}

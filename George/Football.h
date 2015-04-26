@@ -18,8 +18,7 @@ class Football : public Global_Constants {
 		Football(int, int, int);
 		~Football();
 		virtual bool load_enemy();
-		virtual bool check_right(int, int);
-		virtual bool check_left(int, int);
+		virtual bool mario_die(int, int);
 		virtual bool check_up(int, int);
 		virtual void setxCoord(int);
 		virtual void render_enemy(int);
@@ -29,17 +28,19 @@ class Football : public Global_Constants {
 		LTexture gLeftEnemyTexture;
 		SDL_Rect gLeftEnemy[5];
 	private:
-		int f_x;
-		int f_y;
-		int f_h;
-		int f_w;
+		int enemy_xcoord;
+		int enemy_ycoord;
 		Map level1;
 		Map level2;
 		Map * mapPtr;
 		int level;
 		int right_step;
 		int left_step;
+		int enemy_yoriginal;
+		int enemy_xoriginal;
 		bool render_right = true;
+		bool falling = false;
+		bool alive = true;
 };
 
 #endif
@@ -55,14 +56,13 @@ Football::Football() {}
 Football::Football(int xf, int yf, int num_map)
 	: level1(gfile1), level2(gfile2)
 {
-	cout << "here\n";
 	right_step = 2;
 	left_step = 2;
 	level = num_map;
-	f_x = BRICK_WIDTH * xf;
-	f_y = SCREEN_HEIGHT - yf*BRICK_HEIGHT - FOOTBALL_HEIGHT;
-		cout << "here332\n";
-	cout << "here22\n";
+	enemy_xcoord = BRICK_WIDTH * xf;
+	enemy_ycoord = SCREEN_HEIGHT - yf*BRICK_HEIGHT - FOOTBALL_HEIGHT;
+	enemy_xoriginal = enemy_xcoord;
+	enemy_yoriginal = enemy_ycoord;
 	if (level == 1)
 		mapPtr = &level1;
 	else
@@ -70,9 +70,9 @@ Football::Football(int xf, int yf, int num_map)
 	check_bricks();
 	if (!load_enemy())
 		throw invalid_argument("Failed to Load football");
-	if (mapPtr->get_BrickLocation(f_x,f_y + FOOTBALL_HEIGHT) == 0 || !render_right) {
+	if (mapPtr->get_BrickLocation(enemy_xcoord,enemy_ycoord + FOOTBALL_HEIGHT) == 0 || !render_right) {
 		cout << "For " << xf << " and " << yf << endl;
-		cout << "For " << f_x << " and " << f_y << endl;
+		cout << "For " << enemy_xcoord << " and " << enemy_ycoord << endl;
 		if (!render_right) cout << "cant render right\n";
 		throw invalid_argument("Footaball player must be placed on a brick");
 	}
@@ -147,38 +147,33 @@ bool Football::load_enemy()
 	return success;
 }
 
-bool Football::check_right(int mario_x, int mario_y) 
+bool Football::mario_die(int mario_xcoord, int mario_ycoord) 
 {
 
-	if (f_x - (mario_x + LEP_WIDTH) < 2 && mario_y + LEP_HEIGHT > f_y ) {
-		return true;
-	}
-	else {
-		return false;
-	}
+if(!(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > enemy_ycoord && !((enemy_ycoord - mario_ycoord) < 3))){
+					if(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > enemy_ycoord){
+						cout<< "Mario has collided while facing right :DIES" <<endl;
+						return true;
+					}
+				}
+return false;
 }	
 
-bool Football::check_left(int mario_x, int mario_y) 
+bool Football::check_up(int mario_xcoord, int mario_ycoord) 
 {
-	if (f_x - mario_x < 2 && mario_y + LEP_HEIGHT > f_y)
-		return true;
-	else {
-		return false;
-	}
-}
-
-bool Football::check_up(int mario_x, int mario_y) 
-{
-	if (f_x - (mario_x + LEP_WIDTH) < 2 && f_x - mario_x < 2 && mario_y + LEP_HEIGHT < f_y )
-		return true;
-	else {
-		return false;
-	}
+	if (!alive) return false;
+	if(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord + LEP_HEIGHT) > enemy_ycoord+10 && !((enemy_ycoord - mario_ycoord) < 3)){
+				cout<< "attacked from top: kill"<<endl;    
+					falling = true;
+					alive = false;
+					return true;
+				}
+return false;
 }
 
 void Football::setxCoord(int x) 
 {
-	f_x = x;
+	enemy_xcoord = x;
 }
 
 void Football::render_enemy(int gMapLocation_x)
@@ -186,55 +181,62 @@ void Football::render_enemy(int gMapLocation_x)
 	check_bricks();
 	if (right_frame > 16) right_frame = 0;
 	if (left_frame > 16) left_frame = 0;
+	if (falling) {
+		if (enemy_ycoord + 10 + FOOTBALL_HEIGHT < SCREEN_HEIGHT) 
+			enemy_ycoord += 10;
+		else
+			return;
+	}
+	
 	if (render_right) {
-		f_x += right_step;
+		enemy_xcoord += right_step;
 		SDL_Rect* currentEnemy = &gRightEnemy[right_frame % 4];
-		gRightEnemyTexture.render(f_x - gMapLocation_x, f_y, currentEnemy);
+		gRightEnemyTexture.render(enemy_xcoord - gMapLocation_x, enemy_ycoord, currentEnemy);
 		++right_frame;
 	}
 	else {
-		f_x -= left_step;
+		enemy_xcoord -= left_step;
 		SDL_Rect* currentEnemy = &gLeftEnemy[left_frame % 4];
-		gLeftEnemyTexture.render( f_x - gMapLocation_x, f_y, currentEnemy);
+		gLeftEnemyTexture.render( enemy_xcoord - gMapLocation_x, enemy_ycoord, currentEnemy);
 		++left_frame;
 	}
 }	
 
 void Football::check_bricks()
 {
-	//cout << mapPtr->get_BrickLocation(f_x + right_step + FOOTBALL_WIDTH,f_y + FOOTBALL_HEIGHT) << endl;
+	//cout << mapPtr->get_BrickLocation(enemy_xcoord + right_step + FOOTBALL_WIDTH,enemy_ycoord + FOOTBALL_HEIGHT) << endl;
 	// Check if brick on enemy bottom right
-	if (mapPtr->get_BrickLocation(f_x + right_step + FOOTBALL_WIDTH,f_y + FOOTBALL_HEIGHT) == 0) {
+	if (mapPtr->get_BrickLocation(enemy_xcoord + right_step + FOOTBALL_WIDTH,enemy_ycoord + FOOTBALL_HEIGHT) == 0) {
 		//cout << "1\n";
 		render_right = false;
 		return;
 	}
 	// Check if brick on enemy bottom left
-	if (mapPtr->get_BrickLocation(f_x - left_step,f_y + FOOTBALL_HEIGHT) == 0) {
+	if (mapPtr->get_BrickLocation(enemy_xcoord - left_step,enemy_ycoord + FOOTBALL_HEIGHT) == 0) {
 		//cout << "2\n";
 		render_right = true;
 		return;
 	}
 	// Check if brick on enemy right up
-	if (mapPtr->get_BrickLocation(f_x + right_step + FOOTBALL_WIDTH,f_y) == 1) {
+	if (mapPtr->get_BrickLocation(enemy_xcoord + right_step + FOOTBALL_WIDTH,enemy_ycoord) == 1) {
 		//		cout << "3\n";
 		render_right = false;
 		return;
 	}	
 	// Check if brick on enemy left up
-	if (mapPtr->get_BrickLocation(f_x - left_step,f_y) == 1) {
+	if (mapPtr->get_BrickLocation(enemy_xcoord - left_step,enemy_ycoord) == 1) {
 		//cout << "4\n";
 		render_right = true;
 		return;
 	}
 	// Check if brick on enemy right midlevel
-	if (mapPtr->get_BrickLocation(f_x + right_step + FOOTBALL_WIDTH,f_y + BRICK_HEIGHT) == 1) {
+	if (mapPtr->get_BrickLocation(enemy_xcoord + right_step + FOOTBALL_WIDTH,enemy_ycoord + BRICK_HEIGHT) == 1) {
 		//cout << "5\n";
 		render_right = false;
 		return;
 	}	
 	// Check if brick on enemy left midlevel
-	if (mapPtr->get_BrickLocation(f_x - left_step,f_y + BRICK_HEIGHT) == 1) {
+	if (mapPtr->get_BrickLocation(enemy_xcoord - left_step,enemy_ycoord + BRICK_HEIGHT) == 1) {
 		//cout << "6\n";
 		render_right = true;
 		return;

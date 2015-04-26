@@ -213,7 +213,7 @@ int Map::space_brick_up(int xloc, int yloc, int yVel)
 	if (yloc - brick_space == 0) 
 		break;
 	} while (!isBrick_up(xloc, yloc - brick_space, 0) ); 
-	cout << brick_space << endl;
+	
 	return brick_space;
 }
 

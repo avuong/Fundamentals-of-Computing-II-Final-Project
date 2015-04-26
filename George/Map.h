@@ -146,6 +146,7 @@ bool Map::isBrick_up(int xloc, int yloc, int yVel)
 	int y_coord = (yloc + yVel - 6) / BRICK_HEIGHT;
 	int y_remainder = (yloc) % BRICK_HEIGHT;
 	//cout << "ycoord" << " " << y_coord << " " << yloc << endl;
+	if (yloc + yVel -6 <= 0) return true;
 	if (BrickCoordinates[y_coord][x_coord] == 1 && x_remainder < LEP_WIDTH- 5) {
 		return true;
 	}
