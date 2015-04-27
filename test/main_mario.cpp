@@ -660,6 +660,8 @@ int main( int argc, char* args[] )
 					enemyDead = 1;
 					mario_ycoord = mario_ycoord - 85;
 				}
+
+				
 				if(!(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > enemy_ycoord+10 && !((enemy_ycoord - mario_ycoord) < 3))){
 					if(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > enemy_ycoord+10){
 						cout<< "Mario has collided while facing right :DIES" <<endl;
@@ -685,7 +687,7 @@ int main( int argc, char* args[] )
 						if (levelPtr == &level_one) {
 						gMapLocation.x = 0;
 						mario_xcoord = SCREEN_WIDTH/2;
-						mario_ycoord = 0;
+						mario_ycoord = 200;
 						marioDead=0;
 						lifeCount--;
 						}

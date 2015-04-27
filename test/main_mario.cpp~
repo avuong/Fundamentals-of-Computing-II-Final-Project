@@ -658,8 +658,10 @@ int main( int argc, char* args[] )
 				if(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord + LEP_HEIGHT) > enemy_ycoord+10 && !((enemy_ycoord - mario_ycoord) < 3)){
 				cout<< "attacked from top: kill"<<endl;    
 					enemyDead = 1;
-					mario_ycoord = mario_ycoord - 85;
+					//mario_ycoord = mario_ycoord - 85;
 				}
+
+				
 				if(!(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > enemy_ycoord+10 && !((enemy_ycoord - mario_ycoord) < 3))){
 					if(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > enemy_ycoord+10){
 						cout<< "Mario has collided while facing right :DIES" <<endl;
