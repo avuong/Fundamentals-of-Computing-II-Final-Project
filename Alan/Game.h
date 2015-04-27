@@ -1,3 +1,11 @@
+//Game Class which stores the big play function 
+//In this class we implement most of the image loading and rendering
+//We also handle the events based on key input
+//We also instantiate the enemies in this class
+//We also do the level transitions in this class
+//We also free the resources
+
+
 #ifndef GAME_H
 #define GAME_H
 
@@ -12,10 +20,8 @@
 #include "LTexture.h"
 #include "Map.h"
 #include "Global_Constants.h"
-//#include "Football.h"
 #include "FootballPlayer.h"
 #include "Goomba.h"
-//#include "Enemy.h"
 
 using namespace std;
 
@@ -75,6 +81,16 @@ class Game : public Global_Constants {
 		SDL_Rect gtransition_level2;
 		LTexture gtransl2;
 
+		//Render Lives
+		SDL_Rect gThreeLivesLocation;
+		LTexture gThreeLives;
+
+		SDL_Rect gTwoLivesLocation;
+		LTexture gTwoLives;
+
+		SDL_Rect gOneLifeLocation;
+		LTexture gOneLife;
+
 		//Start Screen Rendering
 		SDL_Rect gStartScreen3Location;
 		LTexture gStartScreen3Texture;
@@ -95,16 +111,6 @@ class Game : public Global_Constants {
 		//You Lose: Game Over
 		SDL_Rect gameOverLocation;
 		LTexture gameOverTexture;
-
-		//Render Lives
-		SDL_Rect gThreeLivesLocation;
-		LTexture gThreeLives;
-
-		SDL_Rect gTwoLivesLocation;
-		LTexture gTwoLives;
-
-		SDL_Rect gOneLifeLocation;
-		LTexture gOneLife;
 };
 
 #endif
@@ -170,7 +176,7 @@ bool Game::init()
 		}
 
 		//Create window
-		gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+		gWindow = SDL_CreateWindow( "Super Lep's World", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		if( gWindow == NULL )
 		{
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -213,7 +219,7 @@ bool Game::loadMedia()
 	//Load sprite sheet texture going right
 	if( !gRightSpriteTexture.loadFromFile( "right_lep.png", "white" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load right walking animation texture!\n" );
 		success = false;
 	}
 	else
@@ -248,7 +254,7 @@ bool Game::loadMedia()
 	//Load sprite sheet texture going left
 	if( !gLeftSpriteTexture.loadFromFile( "left_lep.png", "white" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load left walking animation texture!\n" );
 		success = false;
 	}
 	else
@@ -283,7 +289,7 @@ bool Game::loadMedia()
 	string backgroundName = "background.png";
 	if( !gMap.loadFromFile( backgroundName.c_str(), "white" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load background texture!\n" );
 		success = false;
 	}
 	else
@@ -296,7 +302,7 @@ bool Game::loadMedia()
 	//Load sprite sheet texture
 	if( !gGold.loadFromFile( "gold.png", "white" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load gold texture!\n" );
 		success = false;
 	}
 	else
@@ -309,7 +315,7 @@ bool Game::loadMedia()
 
 	if( !gShamrock.loadFromFile( "shamrock.png", "white" ) ) 
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load shamrock texture!\n" );
 		success = false;
 	}
 	else
@@ -320,10 +326,50 @@ bool Game::loadMedia()
 		gShamrockLocation.h = 48;
 	}
 
-	//Load start Screen
+	//Load Life Sheets
+	if( !gThreeLives.loadFromFile( "threelives.png", "green" ) )
+	{
+		printf( "Failed to load three lives texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gThreeLivesLocation.x = 0;	
+		gThreeLivesLocation.y = 0;
+		gThreeLivesLocation.w = 204;
+		gThreeLivesLocation.h = 68;
+	}	
+
+	if( !gTwoLives.loadFromFile( "twolives.png", "green" ) )
+	{
+		printf( "Failed to load two lives texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gTwoLivesLocation.x = 0;	
+		gTwoLivesLocation.y = 0;
+		gTwoLivesLocation.w = 204;
+		gTwoLivesLocation.h = 68;
+	}	
+
+	if( !gOneLife.loadFromFile( "onelife.png", "green" ) )
+	{
+		printf( "Failed to load one life texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gOneLifeLocation.x = 0;	
+		gOneLifeLocation.y = 0;
+		gOneLifeLocation.w = 204;
+		gOneLifeLocation.h = 68;
+	}
+	
+	//Load start Screens
 	if( !gStartScreen3Texture.loadFromFile( "startScreen3.png", "white" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load start screen 3 texture!\n" );
 		success = false;
 	}
 	else
@@ -336,7 +382,7 @@ bool Game::loadMedia()
 
 	if( !gStartScreen2Texture.loadFromFile( "startScreen2.png", "white" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load start screen 2 texture!\n" );
 		success = false;
 	}
 	else
@@ -349,7 +395,7 @@ bool Game::loadMedia()
 
 	if( !gStartScreen1Texture.loadFromFile( "startScreen1.png", "white" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load start screen 1 texture!\n" );
 		success = false;
 	}
 	else
@@ -362,7 +408,7 @@ bool Game::loadMedia()
 
 	if( !gStartScreenGoTexture.loadFromFile( "startScreenGO.png", "white" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load start screen go texture!\n" );
 		success = false;
 	}
 	else
@@ -375,7 +421,7 @@ bool Game::loadMedia()
 	//Load transition
 	if( !gtransl2.loadFromFile( "level2screen.png", "green" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load level 2 texture!\n" );
 		success = false;
 	}
 	else
@@ -389,7 +435,7 @@ bool Game::loadMedia()
 	//You Win Screen
 	if( !youWinTexture.loadFromFile( "YouWin.png", "white" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load you win texture!\n" );
 		success = false;
 	}
 	else
@@ -403,7 +449,7 @@ bool Game::loadMedia()
 	//You Lose:Game Over
 	if( !gameOverTexture.loadFromFile( "gameOver.png", "white" ) )
 	{
-		printf( "Failed to load walking animation texture!\n" );
+		printf( "Failed to load game over texture!\n" );
 		success = false;
 	}
 	else
@@ -413,52 +459,12 @@ bool Game::loadMedia()
 		gameOverLocation.w = 500;
 		gameOverLocation.h = 500;
 	}
-	//Load Life Sheets
-	if( !gThreeLives.loadFromFile( "threelives.png", "green" ) )
-	{
-		printf( "Failed to load walking animation texture!\n" );
-		success = false;
-	}
-	else
-	{
-		gThreeLivesLocation.x = 0;	
-		gThreeLivesLocation.y = 0;
-		gThreeLivesLocation.w = 204;
-		gThreeLivesLocation.h = 68;
-	}	
-
-	if( !gTwoLives.loadFromFile( "twolives.png", "green" ) )
-	{
-		printf( "Failed to load walking animation texture!\n" );
-		success = false;
-	}
-	else
-	{
-		gTwoLivesLocation.x = 0;	
-		gTwoLivesLocation.y = 0;
-		gTwoLivesLocation.w = 204;
-		gTwoLivesLocation.h = 68;
-	}	
-
-	if( !gOneLife.loadFromFile( "onelife.png", "green" ) )
-	{
-		printf( "Failed to load walking animation texture!\n" );
-		success = false;
-	}
-	else
-	{
-		gOneLifeLocation.x = 0;	
-		gOneLifeLocation.y = 0;
-		gOneLifeLocation.w = 204;
-		gOneLifeLocation.h = 68;
-	}
-	
 	return success;
 }
 
 int Game::isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
 {
-	if( spriteX - potLocX >= 1500 && spriteX - potLocX <= 1580 && spriteY >= 369)
+	if( spriteX - potLocX >= 1500 && spriteX - potLocX <= 1580 && spriteY >= 369) //check if coordinates match pot
 		return 1;
 	else
 		return 0;
@@ -467,27 +473,27 @@ int Game::isPotCollide(int potLocX, int spriteX, int potLocY, int spriteY)
 void Game::play()
 {
 	levelPtr->get_coordinates();
-	int render_mario_yloc = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
+	int render_mario_yloc = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT); 
 	int render_mario_xloc = SCREEN_WIDTH/2;
 	int mario_xcoord = SCREEN_WIDTH/2;
 	int mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
-	bool jumping = false;
+	bool jumping = false; //check if jumping
 	bool mario_down = false;
 	int jump_height = 0;
 	int max_jump_height = 150;
 	int mario_yVel= 0;
-	int didShamrockCollide = 0;
-	int life_count = 3;
+	int didShamrockCollide = 0; //check if coin has been collected
+	int life_count = 3; //count lives remaining
 	int num_players = 4;
-	int key=1;
-	vector<Enemy *> map1Players(num_players);
-	vector<Enemy *> map2Players(num_players);
+	vector<Enemy *> map1Players(num_players); //store football player enemies
+	vector<Enemy *> map2Players(num_players); //store goombas
 	if( !init() )
 	{
 		printf( "Failed to initialize!\n" );
 	}
 	else
 	{
+		//create instances of enemies
 		cout << "3\n";
 		FootballPlayer player1(10,2,1);
 		FootballPlayer player2(29,8,1);
@@ -530,31 +536,29 @@ void Game::play()
 			int frame_right = 0;
 			int frame_left = 0;
 			bool mario_right = true;
-	
 
+			//Load the Start Screens
+			//***************************************************************
 			SDL_Rect* startScreen3 = &gStartScreen3Location;
 			gStartScreen3Texture.render( 0, 0, startScreen3 );
-			//Update screen
-			SDL_RenderPresent( gRenderer );
+			SDL_RenderPresent( gRenderer ); //updates the screen
 			usleep(500000);			
 
 			SDL_Rect* startScreen2 = &gStartScreen2Location;
 			gStartScreen2Texture.render( 0, 0, startScreen2 );
-			//Update screen
 			SDL_RenderPresent( gRenderer );
 			usleep(500000);
 
 			SDL_Rect* startScreen1 = &gStartScreen1Location;
 			gStartScreen1Texture.render( 0, 0, startScreen1 );
-			//Update screen
 			SDL_RenderPresent( gRenderer );
 			usleep(500000);
 
 			SDL_Rect* startScreenGo = &gStartScreenGoLocation;
 			gStartScreenGoTexture.render( 0, 0, startScreenGo );
-			//Update screen
 			SDL_RenderPresent( gRenderer );
 			usleep(500000);
+			//***************************************************************
  			
 			//While application is running
 			while( !quit )
@@ -568,53 +572,49 @@ void Game::play()
 						quit = true;
 					}
 				}
-            const Uint8* currentKeyStates = SDL_GetKeyboardState( NULL );
+				
+				//Different events based on key input pressed
+            			const Uint8* currentKeyStates = SDL_GetKeyboardState( NULL );
+
+				//Up arrow key
 				if( currentKeyStates[ SDL_SCANCODE_UP ] )
 				{	
 					if(levelPtr->isBrick_down(mario_xcoord, mario_ycoord)){
-						//mario_ycoord -= max_jump_height;
-					if (!jumping)
-					{
-  						jumping = true;
-  						mario_yVel = 0;
-					}
+						if (!jumping)
+						{
+  							jumping = true;
+  							mario_yVel = 0;
+						}
 					}
 					
 				}
-				else if( currentKeyStates[ SDL_SCANCODE_DOWN ] )
-				{
-				}
+				//Left arrow key
 				else if( currentKeyStates[ SDL_SCANCODE_LEFT ])
 				{
 					if ( gMapLocation.x > 2  && !levelPtr->isBrick_left(mario_xcoord, mario_ycoord) ) {
-						//if(isBrick(mario_xcoord, mario_ycoord) ) {
 							frame_left++;
 							gMapLocation.x -= 5;	
 							mario_xcoord -= 5;
 							mario_right = false;
-						//}
 					}
 				}
+				//Right arrow key
 				else if( currentKeyStates[ SDL_SCANCODE_RIGHT ])
 				{
 					if ( gMapLocation.x <  2000 - 500 && !levelPtr->isBrick_right(mario_xcoord, mario_ycoord) ) {
-						//if (isBrick(mario_xcoord, mario_ycoord)) {
 							frame_right++;
 							gMapLocation.x += 5;		
 							mario_xcoord += 5;
 							mario_right = true;
-						//}
 					}
 					
 				}
+				
+				//jumping for mario
 				if (jumping == true)
 				{
 					if (!levelPtr->isBrick_up(mario_xcoord, mario_ycoord, mario_yVel)) {
-					//	int brick_space_up = levelPtr->space_brick_up(mario_xcoord, mario_ycoord, mario_yVel);
-						//if (brick_space_up > 6)
 							mario_yVel -= 6;
-					//	else
-						//	mario_yVel -= brick_space_up;
 					mario_ycoord = mario_ycoord + mario_yVel;
 					}
 					else {
@@ -627,10 +627,10 @@ void Game::play()
 					if (mario_yVel <= -60)
 					{
 						mario_yVel = 0;
-						//mario_yVel += 60;
 						jumping = false;
 					}
 				}
+
 				//Clear screen
 				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( gRenderer );
@@ -646,33 +646,7 @@ void Game::play()
 				SDL_Rect* potOfGold = &gGoldLocation;
 				gGold.render(1670- gMapLocation.x, 330, potOfGold);
 				isPotCollide(1670- gMapLocation.x, mario_xcoord, 330, mario_ycoord + 27);
-			/*
-				//Render shamrock
-				if(!(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 431) && didShamrockCollide == 0 ){
-					SDL_Rect * shamrock = &gShamrockLocation;
-					gShamrock.render(1228 - gMapLocation.x, 395, shamrock);
-				} //render only if mario doesn't collide
 
-				if(mario_xcoord > 1205 && mario_xcoord < 1250 && (mario_ycoord + 27) == 433)
-						didShamrockCollide = 1;
-				//cout<< "Pot loc x: " << 1670- gMapLocation.x <<endl;
-				//cout<<"mario x " << mario_xcoord<< " mario y "<< mario_ycoord +27 <<endl;
-				// update jumping
-				/*
-			   cout << "jump_height is " << jump_height << " mario down is " << mario_down << endl;
-				if (jumping && jump_height < max_jump_height && !mario_down) {
-					mario_ycoord -= 10;
-					jump_height += 10;
-				}
-				if (jumping && (jump_height >= max_jump_height || mario_down) ) {
-					mario_ycoord += 10;
-					jump_height -= 10;
-					mario_down = true;
-				}
-				if (jumping && mario_down && jump_height == 0) {
-					jumping = false;
-					mario_down = false;
-				}*/
 				if (!levelPtr->isBrick_down(mario_xcoord, mario_ycoord)) {
 					int brick_space_down = levelPtr->space_brick_down(mario_xcoord, mario_ycoord);
 					if (brick_space_down > 20)
@@ -680,6 +654,47 @@ void Game::play()
 					else
 						mario_ycoord += brick_space_down;
 				}
+
+				//Setting up level one
+				if (levelPtr == &level_one) {
+					for (int j = 0; j < num_players; j++) {
+						if (map1Players[j]->check_up(mario_xcoord, mario_ycoord, mario_yVel) ){
+							cout << "true" << endl;
+							 mario_ycoord -= 85;
+						}
+						//respawn to starting position
+						if(map1Players[j]->mario_die(mario_xcoord, mario_ycoord) ) { 
+							
+								gMapLocation.x = 0;
+								mario_xcoord = SCREEN_WIDTH/2;
+								mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
+								mario_yVel = 0;
+								life_count--;
+						}
+						map1Players[j]->render_enemy(gMapLocation.x);
+					}
+				}
+
+				//Setting up level two
+				else {
+					for (int j = 0; j < num_players; j++) {
+						if (map2Players[j]->check_up(mario_xcoord, mario_ycoord, mario_yVel) ){
+							cout << "true" << endl;
+							mario_ycoord -= 85;
+						}
+						//respawn to starting position
+						if(map2Players[j]->mario_die(mario_xcoord, mario_ycoord) ) {
+							
+								gMapLocation.x = 0;
+								mario_xcoord = SCREEN_WIDTH/2;
+								mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
+								mario_yVel = 0;
+								life_count--;
+						}
+						map2Players[j]->render_enemy(gMapLocation.x);
+					}
+				}
+
 				if (mario_right) {
 					SDL_Rect* currentClip = &gRightSprite[ frame_right % 5 ];
 					gRightSpriteTexture.render( render_mario_xloc, mario_ycoord, currentClip );
@@ -688,43 +703,7 @@ void Game::play()
 					SDL_Rect* currentClipLeft = &gLeftSprite[ frame_left % 5 ];
 					gLeftSpriteTexture.render( render_mario_xloc, mario_ycoord, currentClipLeft );
 				}
-			// render enemies on map
-			//	map1Players[0]->render_enemy(gMapLocation.x);
-
-				if (levelPtr == &level_one) {
-					for (int j = 0; j < num_players; j++) {
-						if (map1Players[j]->check_up(mario_xcoord, mario_ycoord) ){
-							cout << "true" << endl;
-							 mario_ycoord -= 85;
-						}
-						if(map1Players[j]->mario_die(mario_xcoord, mario_ycoord) ) {
-							
-								gMapLocation.x = 0;
-								mario_xcoord = SCREEN_WIDTH/2;
-								mario_ycoord = 200;
-								mario_yVel = 0;
-								life_count--;
-						}
-						map1Players[j]->render_enemy(gMapLocation.x);
-					}
-				}
-				else {
-					for (int j = 0; j < num_players; j++) {
-						if (map2Players[j]->check_up(mario_xcoord, mario_ycoord) ){
-							cout << "true" << endl;
-							mario_ycoord -= 85;
-						}
-						if(map2Players[j]->mario_die(mario_xcoord, mario_ycoord) ) {
-							
-								gMapLocation.x = 0;
-								mario_xcoord = SCREEN_WIDTH/2;
-								mario_ycoord = 200;
-								mario_yVel = 0;
-								life_count--;
-						}
-						map2Players[j]->render_enemy(gMapLocation.x);
-					}
-				}
+			
 
 				//Render shamrock
 				if (life_count < 3) {
@@ -740,6 +719,7 @@ void Game::play()
 				}
 	
 				//Render lives
+				//*******************************************************
 				if(life_count ==3){
 					SDL_Rect* life_count = &gThreeLivesLocation;
 					gThreeLives.render(0, 0, life_count);
@@ -760,14 +740,10 @@ void Game::play()
 					usleep(3000000);
 					quit = true;
 				}
+				//*******************************************************
 
-		
-			//	player1.render_enemy(gMapLocation.x);
 				//Update screen
 				SDL_RenderPresent( gRenderer );
-
-				//Go to next frame
-				//++frame;
 
 				//Cycle animation
 				if( frame_right / 5 >= WALKING_ANIMATION_FRAMES )
@@ -779,6 +755,7 @@ void Game::play()
 				{
 					frame_left = 0;
 				}
+
 				// Transisiton to next level. NEED TO KNOW EXACT POINT OF gMapLocation.x
 				// ************************************************************
 				if ( isPotCollide(1670- gMapLocation.x, mario_xcoord, 330, mario_ycoord + 27)) {
@@ -790,6 +767,7 @@ void Game::play()
 						if (!levelPtr->load_bricks() ) quit = true;
 					}
 				//****************************************************************
+					// YOU WIN IF COLLIDE WITH SECOND POT
 					else {
 						SDL_Rect* youWinScreen = &youWinLocation;
 						youWinTexture.render(0, 0, youWinScreen);
@@ -797,6 +775,8 @@ void Game::play()
 						usleep(3000000);
 						quit = true;
 					}
+	
+					//Level two transition
 					if (!quit) {
 						//Render current Map Frame
 						SDL_Rect* l2 = &gtransition_level2;
@@ -809,17 +789,19 @@ void Game::play()
 						while( e.type == SDL_KEYUP );
 					}
 				}
+				
+				//if mario falls of a ledge
 				if (SCREEN_HEIGHT - mario_ycoord <= 46){
-					if (levelPtr == &level_one) {
+					if (levelPtr == &level_one) { //take care of level one
 						gMapLocation.x = 0;
 						mario_xcoord = SCREEN_WIDTH/2;
-						mario_ycoord = 0;
+						mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);;
 						life_count--;
 					}
-					if (levelPtr == &level_two) {
+					if (levelPtr == &level_two) { //take care of level two
 						gMapLocation.x = 0;
 						mario_xcoord = SCREEN_WIDTH/2;
-						mario_ycoord = 0;
+						mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);;
 						life_count--;
 					}
 				}
@@ -831,6 +813,7 @@ void Game::play()
 	close();
 
 }
+
 void Game::close()
 {
 	//Free loaded images

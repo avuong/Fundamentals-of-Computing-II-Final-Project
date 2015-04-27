@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include <cmath>
 //#include "Enemy.h"
 //#include "Game.h"
 
@@ -20,7 +21,7 @@ class Goomba : public Enemy {
 		Goomba(int, int, int);
 		virtual bool load_enemy(string, string);
 		virtual bool mario_die(int, int);
-		virtual bool check_up(int, int);
+		virtual bool check_up(int, int, int);
 		virtual void setxCoord(int);
 		virtual void render_enemy(int);
 	private:
@@ -43,7 +44,7 @@ Goomba::Goomba(int xf, int yf, int num_map)
 {
 	if (!load_enemy(playerpngLeft, playerpngRight))
 		throw invalid_argument("Failed to Load Goomba");
-	if (Enemy::Enemy::mapPtr->get_BrickLocation(Enemy::enemy_xcoord,Enemy::enemy_ycoord + Goomba_HEIGHT) == 0 || !Enemy::render_right) {
+	if (Enemy::mapPtr->get_BrickLocation(Enemy::enemy_xcoord,Enemy::enemy_ycoord + Goomba_HEIGHT) == 0 || !Enemy::render_right) {
 		cout << "For " << xf << " and " << yf << endl;
 		cout << "For " << Enemy::enemy_xcoord << " and " << Enemy::enemy_ycoord << endl;
 		if (!Enemy::render_right) cout << "cant render right\n";
@@ -122,25 +123,56 @@ bool Goomba::load_enemy(string left, string right)
 
 bool Goomba::mario_die(int mario_xcoord, int mario_ycoord) 
 {
-
+	if (!Enemy::alive) return false;
+	if ( (mario_xcoord - Enemy::enemy_xcoord) < Goomba_WIDTH &&(Enemy::enemy_xcoord - mario_xcoord) < LEP_WIDTH ) {
+		//cout << "In range\n";
+		if (Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) < 21  && Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) > -5) {	
+			return false;
+			cout << "false1\n";
+		}
+		else if (Enemy::enemy_ycoord - mario_ycoord >= 0) {
+			if (Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) <= -5  && Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) >= -1*LEP_HEIGHT) {
+			cout << mario_xcoord << " " << Enemy::enemy_xcoord << endl;
+			cout << mario_ycoord << " " << Enemy::enemy_ycoord << endl;
+			cout << "treuu\n";
+			return true;
+			}
+			else {
+			cout << mario_xcoord << " " << Enemy::enemy_xcoord << endl;
+			cout << mario_ycoord << " " << Enemy::enemy_ycoord << endl;
+			cout << "fallllsss\n";
+			}
+		}
+	}
+		//cout << "OUT of range\n";
+		//cout << mario_xcoord << " " << Enemy::enemy_xcoord << endl;/*
+/*
 if(!(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord && !((Enemy::enemy_ycoord - mario_ycoord) < 3))){
 					if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord){
 						cout<< "Mario has collided while facing right :DIES" <<endl;
 						return true;
 					}
 				}
+*/
 return false;
 }	
 
-bool Goomba::check_up(int mario_xcoord, int mario_ycoord) 
+bool Goomba::check_up(int mario_xcoord, int mario_ycoord, int yVel) 
 {
-	if (!Enemy::alive) return false;
+	if ( fabs(mario_xcoord - Enemy::enemy_xcoord) < Goomba_WIDTH && fabs(Enemy::enemy_xcoord - mario_xcoord) < LEP_WIDTH ) {
+		if (Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) < 21  && Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) > -5) {	
+			Enemy::falling = true;
+			Enemy::alive = false;
+			cout << "trueqwer\n";
+			return true;
+		}
+	}/*
 	if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord + LEP_HEIGHT) > Enemy::enemy_ycoord+10 && !((Enemy::enemy_ycoord - mario_ycoord) < 3)){
 				cout<< "attacked from top: kill"<<endl;    
 					Enemy::falling = true;
 					Enemy::alive = false;
 					return true;
-				}
+				}*/
 return false;
 }
 

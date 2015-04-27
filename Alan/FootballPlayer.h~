@@ -39,7 +39,7 @@ FootballPlayer::FootballPlayer() {}
 
 // Call FootballPlayer constructor and inherit from Enemy
 FootballPlayer::FootballPlayer(int xf, int yf, int num_map)
-	: Enemy(xf, yf, num_map)
+	: Enemy(xf, yf, num_map, 1)
 {
 	if (!load_enemy(playerpngLeft, playerpngRight))
 		throw invalid_argument("Failed to Load FootballPlayer");
@@ -63,7 +63,6 @@ bool FootballPlayer::load_enemy(string left, string right)
 
 bool FootballPlayer::mario_die(int mario_xcoord, int mario_ycoord) 
 {
-
 if(!(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord && !((Enemy::enemy_ycoord - mario_ycoord) < 3))){
 					if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord){
 						cout<< "Mario has collided while facing right :DIES" <<endl;
