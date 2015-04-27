@@ -25,10 +25,6 @@ Game::Game()
 		//Pot of Gold Rendering
 		SDL_Rect gGoldLocation;
 		LTexture gGold;
-	
-		//Start Screen Renderin
-		SDL_Rect gStartScreenLocation;
-		LTexture gStartScreen;
 
 		//Level 2 Transition
 		SDL_Rect gtransition_level2;
@@ -198,22 +194,6 @@ bool Game::loadMedia()
 		gGoldLocation.h = 200;
 	}
 
-	//Load start Screen
-	if( !gStartScreen.loadFromFile( "startScreen.png", "white" ) )
-	{
-		printf( "Failed to load walking animation texture!\n" );
-		success = false;
-	}
-	else
-	{
-		gStartScreenLocation.x = 0;	
-		gStartScreenLocation.y = 0;
-		gStartScreenLocation.w = 500;
-		gStartScreenLocation.h = 500;
-	}
-	
-	return success;
-
 	//Load transition
 	if( !gtransl2.loadFromFile( "level2.png", "green" ) )
 	{
@@ -264,7 +244,6 @@ void Game::play()
 	int jump_height = 0;
 	int max_jump_height = 150;
 	int mario_yVel= 0;
-	int key =1;
 	
 	if( !init() )
 	{
@@ -294,20 +273,9 @@ void Game::play()
 			int frame_left = 0;
 			bool mario_right = true;
 
-			SDL_Rect* startScreen = &gStartScreenLocation;
-			gStartScreenTexture.render( 0, 0, startScreen );
-
-			//Update screen
-			SDL_RenderPresent( gRenderer );
-			do {
-				SDL_PollEvent(&e);
-			}
-			while( e.type == SDL_KEYUP );
-
 			//While application is running
 			while( !quit )
 			{
-				cout<<"Hello2"<<endl;
 				//Handle events on queue
 				while( SDL_PollEvent( &e ) != 0 )
 				{
@@ -384,7 +352,7 @@ void Game::play()
 				//Render current Map Frame
 				SDL_Rect* currentMap = &gMapLocation;
 				gMap.render( 0, 0, currentMap );
-				cout<<"Hello3"<<endl;
+	
 				// Render Bricks on map
 				levelPtr->render_Bricks(gMapLocation.x);
 				

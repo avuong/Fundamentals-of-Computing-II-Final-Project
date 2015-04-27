@@ -123,27 +123,26 @@ bool Enemy::load_enemy(string left, string right)
 		printf( "Failed to load walking animation texture!\n" );
 		success = false;
 	}
-	else
-	{
+	else {
 		//Set sprite clips
 		gLeftEnemy[ 0 ].x = 0;
 		gLeftEnemy[ 0 ].y = 0;
-		gLeftEnemy[ 0 ].w =  43;
+		gLeftEnemy[ 0 ].w =  47;
 		gLeftEnemy[ 0 ].h = 50;
 
-		gLeftEnemy[ 1 ].x =  36;
+		gLeftEnemy[ 1 ].x =  47;
 		gLeftEnemy[ 1 ].y =  0;
-		gLeftEnemy[ 1 ].w =  43;
+		gLeftEnemy[ 1 ].w =  47;
 		gLeftEnemy[ 1 ].h = 50;
 		
-		gLeftEnemy[ 2 ].x = 72;
+		gLeftEnemy[ 2 ].x = 94;
 		gLeftEnemy[ 2 ].y = 0;
-		gLeftEnemy[ 2 ].w =  43;
+		gLeftEnemy[ 2 ].w =  47;
 		gLeftEnemy[ 2 ].h = 50;
 
-		gLeftEnemy[ 3 ].x = 108;
+		gLeftEnemy[ 3 ].x = 141;
 		gLeftEnemy[ 3 ].y = 0;
-		gLeftEnemy[ 3 ].w = 43;
+		gLeftEnemy[ 3 ].w = 45;
 		gLeftEnemy[ 3 ].h = 50;
 	}
 	return success;
