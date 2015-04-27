@@ -1,3 +1,9 @@
+// Goomba inherits protected data and
+// public functions from Enemy Class.
+// Contains several virtual functions
+// that override the ones defined in the
+// enemy class
+
 #ifndef GOOMBA_H
 #define GOOMBA_H
 
@@ -159,6 +165,7 @@ return false;
 
 bool Goomba::check_up(int mario_xcoord, int mario_ycoord, int yVel) 
 {
+	if (!Enemy::alive) return false;
 	if ( fabs(mario_xcoord - Enemy::enemy_xcoord) < Goomba_WIDTH && fabs(Enemy::enemy_xcoord - mario_xcoord) < LEP_WIDTH ) {
 		if (Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) < 21  && Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) > -5) {	
 			Enemy::falling = true;
@@ -181,6 +188,7 @@ void Goomba::setxCoord(int x)
 	Enemy::enemy_xcoord = x;
 }
 
+// 
 void Goomba::render_enemy(int gMapLocation_x)
 {
 	check_bricks();

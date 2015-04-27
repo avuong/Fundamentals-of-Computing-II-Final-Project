@@ -3,7 +3,7 @@
 int main()
 {
 	// instantiate Mario Game
-	Game Mario();
+	Game Mario;
 
 	// play game
 	Mario.play();

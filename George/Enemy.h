@@ -1,3 +1,9 @@
+// enemy is the base class and contains
+// several virtual functions such that
+// they can be overriden by child classes
+// to perform the specific operations unique
+// to the particular enemy
+
 #ifndef ENEMY_H
 #define ENEMY_H
 
@@ -8,27 +14,55 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
-//#include "Game.h"
 
 using namespace std;
 
 class Enemy: public Global_Constants {
 	public:
+		// Default Constructor
 		Enemy();
+		
+		// Non-Default Constructor
 		Enemy(int, int, int, int);
+
+		// Deconstructor
 		~Enemy();
+
+		// Load media for the enemy
 		virtual bool load_enemy(string, string);
+
+		// Check if the enemy beats mario
 		virtual bool mario_die(int, int);
+
+		// Check if mario beats enemy
 		virtual bool check_up(int, int, int);
+
+		// set x coordinate of the enemy
 		virtual void setxCoord(int);
+
+		// render the enemy on the screen
 		virtual void render_enemy(int);
+
+		// check if enemy is on brick
 		void check_bricks();
+
+		// Compose object texture for right enemy
       LTexture gRightEnemyTexture;
+
+		// Sprite sheet for enemy right
 		SDL_Rect gRightEnemy[5];
+
+		// Compose object texture for left enemy
 		LTexture gLeftEnemyTexture;
+		
+		// Sprite sheet for enemy left
 		SDL_Rect gLeftEnemy[5];
+
+	// Data protected so it can be inherited
 	protected:
-		int Enemy_WIDTH;
+
+		// Declare protected Data
+		int Enemy_WIDTH;		
 		int Enemy_HEIGHT;
 		int enemy_xcoord;
 		int enemy_ycoord;
@@ -47,17 +81,14 @@ class Enemy: public Global_Constants {
 
 #endif
 
-
-//static int right_frame = 0;
-//static int left_frame = 0;
-
-
 Enemy::Enemy() {}
 
-// Call Enemyconstructor and inherit from Enemy
+// Call Enemy constructor and inherit from Enemy
 Enemy::Enemy(int xf, int yf, int num_map, int enemyID)
 	: level1(gfile1), level2(gfile2)
 {
+	// Get Enemy Id so Generic Enemy dimensions 
+	// can be specified
 	if (enemyID == 2) {
 		Enemy_HEIGHT = Goomba_HEIGHT;
 		Enemy_WIDTH = Goomba_WIDTH;
@@ -66,6 +97,7 @@ Enemy::Enemy(int xf, int yf, int num_map, int enemyID)
 		Enemy_HEIGHT = FootballPlayer_HEIGHT;
 		Enemy_WIDTH = FootballPlayer_WIDTH;
 	}
+	// initialize private data
 	right_step = 2;
 	left_step = 2;
 	level = num_map;
@@ -81,10 +113,9 @@ Enemy::Enemy(int xf, int yf, int num_map, int enemyID)
 }
 
 Enemy::~Enemy()
-{
-	//delete [] gRightEnemy;
-	//delete [] gLeftEnemy;
-}
+{}
+
+// load the enemy sprite sheet
 bool Enemy::load_enemy(string left, string right)
 {
 	bool success = true;
@@ -117,7 +148,7 @@ bool Enemy::load_enemy(string left, string right)
 		gRightEnemy[ 3 ].w = 47;
 		gRightEnemy[ 3 ].h = 51;
 	}
-
+	
 	if( !gLeftEnemyTexture.loadFromFile( left, "white" ) )
 	{
 		printf( "Failed to load walking animation texture!\n" );
@@ -148,6 +179,7 @@ bool Enemy::load_enemy(string left, string right)
 	return success;
 }
 
+// Generic collision detection for enemy
 bool Enemy::mario_die(int mario_xcoord, int mario_ycoord) 
 {
 
@@ -160,6 +192,8 @@ if(!(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xc
 return false;
 }	
 
+// generic collision detection to see if enemy beats mario
+// Should be overridden
 bool Enemy::check_up(int mario_xcoord, int mario_ycoord, int yVel) 
 {
 	if (!alive) return false;
@@ -172,11 +206,13 @@ bool Enemy::check_up(int mario_xcoord, int mario_ycoord, int yVel)
 return false;
 }
 
+// Set X coordinate of the enemy
 void Enemy::setxCoord(int x) 
 {
 	enemy_xcoord = x;
 }
 
+//Virtual function should be overriddden to render enemy
 void Enemy::render_enemy(int gMapLocation_x)
 {/*
 	check_bricks();
@@ -203,42 +239,37 @@ void Enemy::render_enemy(int gMapLocation_x)
 	}*/
 }	
 
+// Set bounds for enemy walk. if there is a brick right or
+// left or not a brick underneath, turn the opposite way
 void Enemy::check_bricks()
 {
-	//cout << mapPtr->get_BrickLocation(enemy_xcoord + right_step + Enemy_WIDTH,enemy_ycoord + Enemy_HEIGHT) << endl;
-	// Check if brick on enemy bottom right
+	// check if brick on enemy bottom right
 	if (mapPtr->get_BrickLocation(enemy_xcoord + right_step + Enemy_WIDTH,enemy_ycoord + Enemy_HEIGHT) == 0) {
-		//cout << "1\n";
 		render_right = false;
 		return;
 	}
 	// Check if brick on enemy bottom left
 	if (mapPtr->get_BrickLocation(enemy_xcoord - left_step,enemy_ycoord + Enemy_HEIGHT) == 0) {
-		//cout << "2\n";
 		render_right = true;
 		return;
 	}
 	// Check if brick on enemy right up
 	if (mapPtr->get_BrickLocation(enemy_xcoord + right_step + Enemy_WIDTH,enemy_ycoord) == 1) {
-		//		cout << "3\n";
 		render_right = false;
 		return;
 	}	
 	// Check if brick on enemy left up
 	if (mapPtr->get_BrickLocation(enemy_xcoord - left_step,enemy_ycoord) == 1) {
-		//cout << "4\n";
 		render_right = true;
 		return;
 	}
 	// Check if brick on enemy right midlevel
 	if (mapPtr->get_BrickLocation(enemy_xcoord + right_step + Enemy_WIDTH,enemy_ycoord + BRICK_HEIGHT) == 1) {
-		//cout << "5\n";
 		render_right = false;
 		return;
 	}	
 	// Check if brick on enemy left midlevel
 	if (mapPtr->get_BrickLocation(enemy_xcoord - left_step,enemy_ycoord + BRICK_HEIGHT) == 1) {
-		//cout << "6\n";
 		render_right = true;
 		return;
 	}

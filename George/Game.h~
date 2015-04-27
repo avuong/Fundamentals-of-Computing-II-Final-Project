@@ -815,13 +815,13 @@ void Game::play()
 					if (levelPtr == &level_one) {
 						gMapLocation.x = 0;
 						mario_xcoord = SCREEN_WIDTH/2;
-						mario_ycoord = 0;
+						mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);;
 						life_count--;
 					}
 					if (levelPtr == &level_two) {
 						gMapLocation.x = 0;
 						mario_xcoord = SCREEN_WIDTH/2;
-						mario_ycoord = 0;
+						mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);;
 						life_count--;
 					}
 				}
