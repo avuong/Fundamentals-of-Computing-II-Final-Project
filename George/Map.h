@@ -35,13 +35,13 @@ class Map : public Global_Constants{
 		void render_Bricks(int);
 
 		// Returns whether is brick is there
-		bool isBrick_down(int, int);
+		bool isBrick_down(int, int, int);
 
 		// Check if a brick is up
 		bool isBrick_up(int, int, int);
 		
 		// Check if a brick is to the right
-		bool isBrick_right(int, int);
+		bool isBrick_right(int, int, int);
 
 		// check left
 		bool isBrick_left(int, int);
@@ -148,7 +148,7 @@ void Map::render_Bricks(int gLocation_x)
 }
 
 // Check if Mario is on top of a brick
-bool Map::isBrick_down(int xloc, int yloc)
+bool Map::isBrick_down(int xloc, int yloc, int yVel)
 {
 	int x_coord = xloc/BRICK_HEIGHT;
 	int x_remainder = xloc % BRICK_HEIGHT;
@@ -190,7 +190,7 @@ bool Map::isBrick_up(int xloc, int yloc, int yVel)
 }
 
 // Check if there is a brick to the right of mario
-bool Map::isBrick_right(int xloc, int yloc)
+bool Map::isBrick_right(int xloc, int yloc, int yVel)
 {
 	int x_coord = (xloc + LEP_WIDTH+ 2) / BRICK_HEIGHT;
 	int x_remainder = (xloc + LEP_WIDTH) % BRICK_HEIGHT;
@@ -209,7 +209,7 @@ bool Map::isBrick_right(int xloc, int yloc)
 // Check if there is a brick to the left
 bool Map::isBrick_left(int xloc, int yloc)
 {
-	int x_coord = (xloc) / BRICK_HEIGHT;
+	int x_coord = (xloc - 4) / BRICK_HEIGHT;
 	int x_remainder = (xloc) % BRICK_HEIGHT;
 	int y_coord = (yloc) / BRICK_HEIGHT;
 	int y_remainder = (yloc) % BRICK_HEIGHT;
@@ -233,7 +233,7 @@ int Map::space_brick_down(int xloc, int yloc)
 	++brick_space;
 	if (brick_space + yloc + LEP_HEIGHT== SCREEN_HEIGHT) 
 		break;
-	} while (!isBrick_down(xloc, yloc + brick_space) ); 
+	} while (!isBrick_down(xloc, yloc + brick_space, 0) ); 
 	
 	return brick_space;
 }

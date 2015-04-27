@@ -85,12 +85,14 @@ bool FootballPlayer::load_enemy(string left, string right)
 // check if enemy beats mario
 bool FootballPlayer::mario_die(int mario_xcoord, int mario_ycoord) 
 {
+
 if(!(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord && !((Enemy::enemy_ycoord - mario_ycoord) < 3))){
 					if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord){
-						cout<< "Mario has collided while facing right :DIES" <<endl;
 						return true;
 					}
 				}
+return false;
+
 return false;
 }	
 
@@ -99,7 +101,6 @@ bool FootballPlayer::check_up(int mario_xcoord, int mario_ycoord, int yVel)
 {
 	if (!Enemy::alive) return false;
 	if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord + LEP_HEIGHT) > Enemy::enemy_ycoord+10 && !((Enemy::enemy_ycoord - mario_ycoord) < 3)){
-				cout<< "attacked from top: kill"<<endl;    
 					Enemy::falling = true;
 					Enemy::alive = false;
 					return true;

@@ -74,31 +74,45 @@ FootballPlayer::FootballPlayer(int xf, int yf, int num_map)
 }
 
 FootballPlayer::~FootballPlayer()
-{
-	//delete [] gRightEnemy;
-	//delete [] gLeftEnemy;
-}
+{}
+
+// Call Enemy to load png file
 bool FootballPlayer::load_enemy(string left, string right)
 {
 	return Enemy::load_enemy(playerpngLeft, playerpngRight);
 }
 
+// check if enemy beats mario
 bool FootballPlayer::mario_die(int mario_xcoord, int mario_ycoord) 
 {
+/*
 if(!(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord && !((Enemy::enemy_ycoord - mario_ycoord) < 3))){
 					if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord){
-						cout<< "Mario has collided while facing right :DIES" <<endl;
 						return true;
 					}
 				}
+return false;*/
+if (!Enemy::alive) return false;
+	if ( (mario_xcoord - Enemy::enemy_xcoord) < FootballPlayer_WIDTH &&(Enemy::enemy_xcoord - mario_xcoord) < LEP_WIDTH ) {
+		if (Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) < 21  && Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) > -5) {	
+			return false;
+		}
+		else if (Enemy::enemy_ycoord - mario_ycoord >= -8) {
+			cout << Enemy::enemy_ycoord << " " << mario_ycoord << endl;
+			if (Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) <= -5  && Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) >= -1*LEP_HEIGHT - 15) {
+			return true;
+			}
+		}
+	}
+
 return false;
 }	
 
+// Check if mario beats the enemy
 bool FootballPlayer::check_up(int mario_xcoord, int mario_ycoord, int yVel) 
 {
 	if (!Enemy::alive) return false;
 	if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord + LEP_HEIGHT) > Enemy::enemy_ycoord+10 && !((Enemy::enemy_ycoord - mario_ycoord) < 3)){
-				cout<< "attacked from top: kill"<<endl;    
 					Enemy::falling = true;
 					Enemy::alive = false;
 					return true;
@@ -106,13 +120,16 @@ bool FootballPlayer::check_up(int mario_xcoord, int mario_ycoord, int yVel)
 return false;
 }
 
+// set the x coordinate
 void FootballPlayer::setxCoord(int x) 
 {
 	Enemy::enemy_xcoord = x;
 }
 
+// Render the enemy 
 void FootballPlayer::render_enemy(int gMapLocation_x)
 {
+	// function call determines direction
 	check_bricks();
 	if (right_frame > 16) right_frame = 0;
 	if (left_frame > 16) left_frame = 0;
@@ -122,13 +139,14 @@ void FootballPlayer::render_enemy(int gMapLocation_x)
 		else
 			return;
 	}
-	
+	// render right
 	if (Enemy::render_right) {
 		Enemy::enemy_xcoord += Enemy::right_step;
 		SDL_Rect* currentEnemy = &Enemy::gRightEnemy[right_frame % 4];
 		Enemy::gRightEnemyTexture.render(Enemy::enemy_xcoord - gMapLocation_x, Enemy::enemy_ycoord, currentEnemy);
 		++right_frame;
 	}
+	// render left
 	else {
 		Enemy::enemy_xcoord -= Enemy::left_step;
 		SDL_Rect* currentEnemy = &Enemy::gLeftEnemy[left_frame % 4];

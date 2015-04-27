@@ -15,22 +15,37 @@
 #include <string>
 #include <stdexcept>
 #include <cmath>
-//#include "Enemy.h"
-//#include "Game.h"
 
 using namespace std;
 
 class Goomba : public Enemy {
 	public:
+		// Constructor
 		Goomba();
+
+		// Deconstructor
 		~Goomba();
+
+		// non-default constructor
 		Goomba(int, int, int);
+
+		// load enemy virtual function
 		virtual bool load_enemy(string, string);
+
+		// check if enemy beats mario
 		virtual bool mario_die(int, int);
+
+		// check if mario beats enemy
 		virtual bool check_up(int, int, int);
+
+		// set the x coordinate
 		virtual void setxCoord(int);
+	
+		// render the enemy
 		virtual void render_enemy(int);
+
 	private:
+		// Name of the png files for sprite sheets
 		string playerpngLeft = "goomba_left.png";
 		string playerpngRight = "goomba_right.png";
 };
@@ -59,10 +74,8 @@ Goomba::Goomba(int xf, int yf, int num_map)
 }
 
 Goomba::~Goomba()
-{
-	//delete [] gRightEnemy;
-	//delete [] gLeftEnemy;
-}
+{}
+
 bool Goomba::load_enemy(string left, string right)
 {
 	bool success = true;
@@ -127,42 +140,26 @@ bool Goomba::load_enemy(string left, string right)
 	return success;
 }
 
+// Check if enemy beats mario
 bool Goomba::mario_die(int mario_xcoord, int mario_ycoord) 
 {
 	if (!Enemy::alive) return false;
 	if ( (mario_xcoord - Enemy::enemy_xcoord) < Goomba_WIDTH &&(Enemy::enemy_xcoord - mario_xcoord) < LEP_WIDTH ) {
-		//cout << "In range\n";
 		if (Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) < 21  && Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) > -5) {	
 			return false;
-			cout << "false1\n";
 		}
 		else if (Enemy::enemy_ycoord - mario_ycoord >= 0) {
 			if (Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) <= -5  && Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) >= -1*LEP_HEIGHT) {
-			cout << mario_xcoord << " " << Enemy::enemy_xcoord << endl;
-			cout << mario_ycoord << " " << Enemy::enemy_ycoord << endl;
-			cout << "treuu\n";
 			return true;
-			}
-			else {
-			cout << mario_xcoord << " " << Enemy::enemy_xcoord << endl;
-			cout << mario_ycoord << " " << Enemy::enemy_ycoord << endl;
-			cout << "fallllsss\n";
 			}
 		}
 	}
-		//cout << "OUT of range\n";
-		//cout << mario_xcoord << " " << Enemy::enemy_xcoord << endl;/*
-/*
-if(!(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord && !((Enemy::enemy_ycoord - mario_ycoord) < 3))){
-					if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord){
-						cout<< "Mario has collided while facing right :DIES" <<endl;
-						return true;
-					}
-				}
-*/
+
 return false;
 }	
 
+// Check if there is a collision and enemy beats mario
+// This function overrides the one defined in the enemy class.
 bool Goomba::check_up(int mario_xcoord, int mario_ycoord, int yVel) 
 {
 	if (!Enemy::alive) return false;
@@ -173,27 +170,25 @@ bool Goomba::check_up(int mario_xcoord, int mario_ycoord, int yVel)
 			cout << "trueqwer\n";
 			return true;
 		}
-	}/*
-	if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord + LEP_HEIGHT) > Enemy::enemy_ycoord+10 && !((Enemy::enemy_ycoord - mario_ycoord) < 3)){
-				cout<< "attacked from top: kill"<<endl;    
-					Enemy::falling = true;
-					Enemy::alive = false;
-					return true;
-				}*/
+	}
 return false;
 }
 
+// set the x coordinate
 void Goomba::setxCoord(int x) 
 {
 	Enemy::enemy_xcoord = x;
 }
 
-// 
+// render enemy on the screen
 void Goomba::render_enemy(int gMapLocation_x)
 {
+	// Check bricks function call determines direction
 	check_bricks();
 	if (r_frame > 16) r_frame = 0;
 	if (l_frame > 16) l_frame = 0;
+
+	// Enemy falls of screen if mario beats it
 	if (Enemy::falling) {
 		if (Enemy::enemy_ycoord + 10 + Goomba_HEIGHT < SCREEN_HEIGHT) 
 			Enemy::enemy_ycoord += 10;
@@ -201,12 +196,15 @@ void Goomba::render_enemy(int gMapLocation_x)
 			return;
 	}
 	
+	// render enemy to the right
 	if (Enemy::render_right) {
 		Enemy::enemy_xcoord += Enemy::right_step;
 		SDL_Rect* currentEnemy = &Enemy::gRightEnemy[r_frame % 4];
 		Enemy::gRightEnemyTexture.render(Enemy::enemy_xcoord - gMapLocation_x, Enemy::enemy_ycoord, currentEnemy);
 		++r_frame;
 	}
+	
+	// Render to the left
 	else {
 		Enemy::enemy_xcoord -= Enemy::left_step;
 		SDL_Rect* currentEnemy = &Enemy::gLeftEnemy[l_frame % 4];

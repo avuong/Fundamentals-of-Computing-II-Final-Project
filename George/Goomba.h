@@ -150,13 +150,7 @@ bool Goomba::mario_die(int mario_xcoord, int mario_ycoord)
 		}
 		else if (Enemy::enemy_ycoord - mario_ycoord >= 0) {
 			if (Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) <= -5  && Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) >= -1*LEP_HEIGHT) {
-			cout << mario_xcoord << " " << Enemy::enemy_xcoord << endl;
-			cout << mario_ycoord << " " << Enemy::enemy_ycoord << endl;
 			return true;
-			}
-			else {
-			cout << mario_xcoord << " " << Enemy::enemy_xcoord << endl;
-			cout << mario_ycoord << " " << Enemy::enemy_ycoord << endl;
 			}
 		}
 	}
@@ -173,7 +167,6 @@ bool Goomba::check_up(int mario_xcoord, int mario_ycoord, int yVel)
 		if (Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) < 21  && Enemy::enemy_ycoord - (mario_ycoord + LEP_HEIGHT) > -5) {	
 			Enemy::falling = true;
 			Enemy::alive = false;
-			cout << "trueqwer\n";
 			return true;
 		}
 	}
