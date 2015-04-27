@@ -84,6 +84,27 @@ class Game : public Global_Constants {
 
 		SDL_Rect gOneLifeLocation;
 		LTexture gOneLife;
+
+		//Start Screen Rendering
+		SDL_Rect gStartScreen3Location;
+		LTexture gStartScreen3Texture;
+
+		SDL_Rect gStartScreen2Location;
+		LTexture gStartScreen2Texture;
+
+		SDL_Rect gStartScreen1Location;
+		LTexture gStartScreen1Texture;
+
+		SDL_Rect gStartScreenGoLocation;
+		LTexture gStartScreenGoTexture;
+
+		//You Win
+		SDL_Rect youWinLocation;
+		LTexture youWinTexture;
+
+		//You Lose: Game Over
+		SDL_Rect gameOverLocation;
+		LTexture gameOverTexture;
 };
 
 #endif
@@ -299,20 +320,6 @@ bool Game::loadMedia()
 		gShamrockLocation.h = 48;
 	}
 
-	//Load transition
-	if( !gtransl2.loadFromFile( "level2.png", "green" ) )
-	{
-		printf( "Failed to load walking animation texture!\n" );
-		success = false;
-	}
-	else
-	{
-		gtransition_level2.x = 0;	
-		gtransition_level2.y = 0;
-		gtransition_level2.w = 500;
-		gtransition_level2.h = 500;
-	}
-
 	//Load Life Sheets
 	if( !gThreeLives.loadFromFile( "threelives.png", "green" ) )
 	{
@@ -353,6 +360,99 @@ bool Game::loadMedia()
 		gOneLifeLocation.h = 68;
 	}
 	
+	//Load start Screen
+	if( !gStartScreen3Texture.loadFromFile( "startScreen3.png", "white" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gStartScreen3Location.x = 0;	
+		gStartScreen3Location.y = 0;
+		gStartScreen3Location.w = 500;
+		gStartScreen3Location.h = 500;
+	}
+
+	if( !gStartScreen2Texture.loadFromFile( "startScreen2.png", "white" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gStartScreen2Location.x = 0;	
+		gStartScreen2Location.y = 0;
+		gStartScreen2Location.w = 500;
+		gStartScreen2Location.h = 500;
+	}
+
+	if( !gStartScreen1Texture.loadFromFile( "startScreen1.png", "white" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gStartScreen1Location.x = 0;	
+		gStartScreen1Location.y = 0;
+		gStartScreen1Location.w = 500;
+		gStartScreen1Location.h = 500;
+	}
+
+	if( !gStartScreenGoTexture.loadFromFile( "startScreenGO.png", "white" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gStartScreenGoLocation.x = 0;	
+		gStartScreenGoLocation.y = 0;
+		gStartScreenGoLocation.w = 500;
+		gStartScreenGoLocation.h = 500;
+	}
+	//Load transition
+	if( !gtransl2.loadFromFile( "level2screen.png", "green" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gtransition_level2.x = 0;	
+		gtransition_level2.y = 0;
+		gtransition_level2.w = 500;
+		gtransition_level2.h = 500;
+	}
+
+	//You Win Screen
+	if( !youWinTexture.loadFromFile( "YouWin.png", "white" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		youWinLocation.x = 80;	
+		youWinLocation.y = 0;
+		youWinLocation.w = 500;
+		youWinLocation.h = 500;
+	}
+
+	//You Lose:Game Over
+	if( !gameOverTexture.loadFromFile( "gameOver.png", "white" ) )
+	{
+		printf( "Failed to load walking animation texture!\n" );
+		success = false;
+	}
+	else
+	{
+		gameOverLocation.x = 0;	
+		gameOverLocation.y = 0;
+		gameOverLocation.w = 500;
+		gameOverLocation.h = 500;
+	}
 	return success;
 }
 
@@ -430,6 +530,31 @@ void Game::play()
 			int frame_left = 0;
 			bool mario_right = true;
 
+			
+			SDL_Rect* startScreen3 = &gStartScreen3Location;
+			gStartScreen3Texture.render( 0, 0, startScreen3 );
+			//Update screen
+			SDL_RenderPresent( gRenderer );
+			usleep(500000);			
+
+			SDL_Rect* startScreen2 = &gStartScreen2Location;
+			gStartScreen2Texture.render( 0, 0, startScreen2 );
+			//Update screen
+			SDL_RenderPresent( gRenderer );
+			usleep(500000);
+
+			SDL_Rect* startScreen1 = &gStartScreen1Location;
+			gStartScreen1Texture.render( 0, 0, startScreen1 );
+			//Update screen
+			SDL_RenderPresent( gRenderer );
+			usleep(500000);
+
+			SDL_Rect* startScreenGo = &gStartScreenGoLocation;
+			gStartScreenGoTexture.render( 0, 0, startScreenGo );
+			//Update screen
+			SDL_RenderPresent( gRenderer );
+			usleep(500000);
+ 			
 			//While application is running
 			while( !quit )
 			{
@@ -630,6 +755,11 @@ void Game::play()
 					gOneLife.render(0,0, life_count);
 				}
 				if(life_count ==0){
+					SDL_Rect* gameOverScreen = &gameOverLocation;
+					gameOverTexture.render(0, 0, gameOverScreen);
+					cout<<"Rendered\n";
+					SDL_RenderPresent( gRenderer );
+					usleep(3000000);
 					quit = true;
 				}
 
@@ -663,6 +793,10 @@ void Game::play()
 					}
 				//****************************************************************
 					else {
+						SDL_Rect* youWinScreen = &youWinLocation;
+						youWinTexture.render(0, 0, youWinScreen);
+						SDL_RenderPresent( gRenderer );
+						usleep(3000000);
 						quit = true;
 					}
 					if (!quit) {
