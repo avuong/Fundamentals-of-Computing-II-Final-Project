@@ -554,20 +554,13 @@ void Game::play()
 					else
 						mario_ycoord += brick_space_down;
 				}
-				if (mario_right) {
-					SDL_Rect* currentClip = &gRightSprite[ frame_right % 5 ];
-					gRightSpriteTexture.render( render_mario_xloc, mario_ycoord, currentClip );
-				}
-				else {
-					SDL_Rect* currentClipLeft = &gLeftSprite[ frame_left % 5 ];
-					gLeftSpriteTexture.render( render_mario_xloc, mario_ycoord, currentClipLeft );
-				}
-			// render enemies on map
+
+				// render enemies on map
 			//	map1Players[0]->render_enemy(gMapLocation.x);
 
 				if (levelPtr == &level_one) {
 					for (int j = 0; j < num_players; j++) {
-						if (map1Players[j]->check_up(mario_xcoord, mario_ycoord) ){
+						if (map1Players[j]->check_up(mario_xcoord, mario_ycoord, mario_yVel) ){
 							cout << "true" << endl;
 							 mario_ycoord -= 85;
 						}
@@ -575,7 +568,7 @@ void Game::play()
 							
 								gMapLocation.x = 0;
 								mario_xcoord = SCREEN_WIDTH/2;
-								mario_ycoord = 200;
+								mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
 								mario_yVel = 0;
 								life_count--;
 						}
@@ -584,7 +577,7 @@ void Game::play()
 				}
 				else {
 					for (int j = 0; j < num_players; j++) {
-						if (map2Players[j]->check_up(mario_xcoord, mario_ycoord) ){
+						if (map2Players[j]->check_up(mario_xcoord, mario_ycoord, mario_yVel) ){
 							cout << "true" << endl;
 							mario_ycoord -= 85;
 						}
@@ -592,13 +585,23 @@ void Game::play()
 							
 								gMapLocation.x = 0;
 								mario_xcoord = SCREEN_WIDTH/2;
-								mario_ycoord = 200;
+								mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
 								mario_yVel = 0;
 								life_count--;
 						}
 						map2Players[j]->render_enemy(gMapLocation.x);
 					}
 				}
+
+				if (mario_right) {
+					SDL_Rect* currentClip = &gRightSprite[ frame_right % 5 ];
+					gRightSpriteTexture.render( render_mario_xloc, mario_ycoord, currentClip );
+				}
+				else {
+					SDL_Rect* currentClipLeft = &gLeftSprite[ frame_left % 5 ];
+					gLeftSpriteTexture.render( render_mario_xloc, mario_ycoord, currentClipLeft );
+				}
+			
 
 				//Render shamrock
 				if (life_count < 3) {

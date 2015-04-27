@@ -20,7 +20,7 @@ class FootballPlayer : public Enemy {
 		FootballPlayer(int, int, int);
 		virtual bool load_enemy(string, string);
 		virtual bool mario_die(int, int);
-		virtual bool check_up(int, int);
+		virtual bool check_up(int, int, int);
 		virtual void setxCoord(int);
 		virtual void render_enemy(int);
 	private:
@@ -63,7 +63,6 @@ bool FootballPlayer::load_enemy(string left, string right)
 
 bool FootballPlayer::mario_die(int mario_xcoord, int mario_ycoord) 
 {
-
 if(!(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord && !((Enemy::enemy_ycoord - mario_ycoord) < 3))){
 					if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord +LEP_HEIGHT) > Enemy::enemy_ycoord){
 						cout<< "Mario has collided while facing right :DIES" <<endl;
@@ -73,7 +72,7 @@ if(!(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+
 return false;
 }	
 
-bool FootballPlayer::check_up(int mario_xcoord, int mario_ycoord) 
+bool FootballPlayer::check_up(int mario_xcoord, int mario_ycoord, int yVel) 
 {
 	if (!Enemy::alive) return false;
 	if(Enemy::enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (Enemy::enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord + LEP_HEIGHT) > Enemy::enemy_ycoord+10 && !((Enemy::enemy_ycoord - mario_ycoord) < 3)){

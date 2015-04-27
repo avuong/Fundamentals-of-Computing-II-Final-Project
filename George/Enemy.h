@@ -19,7 +19,7 @@ class Enemy: public Global_Constants {
 		~Enemy();
 		virtual bool load_enemy(string, string);
 		virtual bool mario_die(int, int);
-		virtual bool check_up(int, int);
+		virtual bool check_up(int, int, int);
 		virtual void setxCoord(int);
 		virtual void render_enemy(int);
 		void check_bricks();
@@ -160,7 +160,7 @@ if(!(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xc
 return false;
 }	
 
-bool Enemy::check_up(int mario_xcoord, int mario_ycoord) 
+bool Enemy::check_up(int mario_xcoord, int mario_ycoord, int yVel) 
 {
 	if (!alive) return false;
 	if(enemy_xcoord - (mario_xcoord+LEP_WIDTH) < 0 && (enemy_xcoord+34) -(mario_xcoord +LEP_WIDTH) > -34 && (mario_ycoord + LEP_HEIGHT) > enemy_ycoord+10 && !((enemy_ycoord - mario_ycoord) < 3)){
