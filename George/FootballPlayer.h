@@ -46,8 +46,8 @@ class FootballPlayer : public Enemy {
 		virtual void render_enemy(int);
 	private:
 		// name of png files
-		string playerpngLeft = "football_left.png";
-		string playerpngRight = "football_right.png";
+		string playerpngLeft = "Media/football_left.png";
+		string playerpngRight = "Media/football_right.png";
 };
 
 #endif

@@ -217,7 +217,7 @@ bool Game::loadMedia()
 	bool success = true;
 
 	//Load sprite sheet texture going right
-	if( !gRightSpriteTexture.loadFromFile( "right_lep.png", "white" ) )
+	if( !gRightSpriteTexture.loadFromFile( "Media/right_lep.png", "white" ) )
 	{
 		printf( "Failed to load right walking animation texture!\n" );
 		success = false;
@@ -252,7 +252,7 @@ bool Game::loadMedia()
 	}
 
 	//Load sprite sheet texture going left
-	if( !gLeftSpriteTexture.loadFromFile( "left_lep.png", "white" ) )
+	if( !gLeftSpriteTexture.loadFromFile( "Media/left_lep.png", "white" ) )
 	{
 		printf( "Failed to load left walking animation texture!\n" );
 		success = false;
@@ -286,7 +286,7 @@ bool Game::loadMedia()
 		gLeftSprite[ 4 ].h = 43;
 	}
 	//Load sprite sheet texture
-	string backgroundName = "background.png";
+	string backgroundName = "Media/background.png";
 	if( !gMap.loadFromFile( backgroundName.c_str(), "white" ) )
 	{
 		printf( "Failed to load background texture!\n" );
@@ -300,7 +300,7 @@ bool Game::loadMedia()
 		gMapLocation.h = SCREEN_HEIGHT;
 	}	
 	//Load sprite sheet texture
-	if( !gGold.loadFromFile( "gold.png", "white" ) )
+	if( !gGold.loadFromFile( "Media/gold.png", "white" ) )
 	{
 		printf( "Failed to load gold texture!\n" );
 		success = false;
@@ -313,7 +313,7 @@ bool Game::loadMedia()
 		gGoldLocation.h = 200;
 	}
 
-	if( !gShamrock.loadFromFile( "shamrock.png", "white" ) ) 
+	if( !gShamrock.loadFromFile( "Media/shamrock.png", "white" ) ) 
 	{
 		printf( "Failed to load shamrock texture!\n" );
 		success = false;
@@ -327,7 +327,7 @@ bool Game::loadMedia()
 	}
 
 	//Load Life Sheets
-	if( !gThreeLives.loadFromFile( "threelives.png", "green" ) )
+	if( !gThreeLives.loadFromFile( "Media/threelives.png", "green" ) )
 	{
 		printf( "Failed to load three lives texture!\n" );
 		success = false;
@@ -340,7 +340,7 @@ bool Game::loadMedia()
 		gThreeLivesLocation.h = 68;
 	}	
 
-	if( !gTwoLives.loadFromFile( "twolives.png", "green" ) )
+	if( !gTwoLives.loadFromFile( "Media/twolives.png", "green" ) )
 	{
 		printf( "Failed to load two lives texture!\n" );
 		success = false;
@@ -353,7 +353,7 @@ bool Game::loadMedia()
 		gTwoLivesLocation.h = 68;
 	}	
 
-	if( !gOneLife.loadFromFile( "onelife.png", "green" ) )
+	if( !gOneLife.loadFromFile( "Media/onelife.png", "green" ) )
 	{
 		printf( "Failed to load one life texture!\n" );
 		success = false;
@@ -367,7 +367,7 @@ bool Game::loadMedia()
 	}
 	
 	//Load start Screens
-	if( !gStartScreen3Texture.loadFromFile( "startScreen3.png", "white" ) )
+	if( !gStartScreen3Texture.loadFromFile( "Media/startScreen3.png", "white" ) )
 	{
 		printf( "Failed to load start screen 3 texture!\n" );
 		success = false;
@@ -380,7 +380,7 @@ bool Game::loadMedia()
 		gStartScreen3Location.h = 500;
 	}
 
-	if( !gStartScreen2Texture.loadFromFile( "startScreen2.png", "white" ) )
+	if( !gStartScreen2Texture.loadFromFile( "Media/startScreen2.png", "white" ) )
 	{
 		printf( "Failed to load start screen 2 texture!\n" );
 		success = false;
@@ -393,7 +393,7 @@ bool Game::loadMedia()
 		gStartScreen2Location.h = 500;
 	}
 
-	if( !gStartScreen1Texture.loadFromFile( "startScreen1.png", "white" ) )
+	if( !gStartScreen1Texture.loadFromFile( "Media/startScreen1.png", "white" ) )
 	{
 		printf( "Failed to load start screen 1 texture!\n" );
 		success = false;
@@ -406,7 +406,7 @@ bool Game::loadMedia()
 		gStartScreen1Location.h = 500;
 	}
 
-	if( !gStartScreenGoTexture.loadFromFile( "startScreenGO.png", "white" ) )
+	if( !gStartScreenGoTexture.loadFromFile( "Media/startScreenGO.png", "white" ) )
 	{
 		printf( "Failed to load start screen go texture!\n" );
 		success = false;
@@ -419,7 +419,7 @@ bool Game::loadMedia()
 		gStartScreenGoLocation.h = 500;
 	}
 	//Load transition
-	if( !gtransl2.loadFromFile( "level2screen.png", "green" ) )
+	if( !gtransl2.loadFromFile( "Media/level2screen.png", "green" ) )
 	{
 		printf( "Failed to load level 2 texture!\n" );
 		success = false;
@@ -433,7 +433,7 @@ bool Game::loadMedia()
 	}
 
 	//You Win Screen
-	if( !youWinTexture.loadFromFile( "YouWin.png", "white" ) )
+	if( !youWinTexture.loadFromFile( "Media/YouWin.png", "white" ) )
 	{
 		printf( "Failed to load you win texture!\n" );
 		success = false;
@@ -447,7 +447,7 @@ bool Game::loadMedia()
 	}
 
 	//You Lose:Game Over
-	if( !gameOverTexture.loadFromFile( "gameOver.png", "white" ) )
+	if( !gameOverTexture.loadFromFile( "Media/gameOver.png", "white" ) )
 	{
 		printf( "Failed to load game over texture!\n" );
 		success = false;
@@ -667,6 +667,7 @@ void Game::play()
 								mario_ycoord = 480-(2*BRICK_HEIGHT)-(LEP_HEIGHT);
 								mario_yVel = 0;
 								life_count--;
+							
 						}
 						map1Players[j]->render_enemy(gMapLocation.x);
 					}
@@ -811,25 +812,6 @@ void Game::play()
 
 void Game::close()
 {
-	//Free loaded images
-	gRightSpriteTexture.free();
-	gLeftSpriteTexture.free();
-	gMap.free();
-	gShamrock.free();
-	gGold.free();
-	gtransl2.free();
-	gThreeLives.free();
-	gTwoLives.free();
-	gOneLife.free();
-	youWinTexture.free();
-	gameOverTexture.free();
-
-	//Destroy window	
-	SDL_DestroyRenderer( gRenderer );
-	SDL_DestroyWindow( gWindow );
-	gWindow = NULL;
-	gRenderer = NULL;
-
 	//Quit SDL subsystems
 	IMG_Quit();
 	SDL_Quit();

@@ -86,7 +86,7 @@ bool Map::load_bricks()
 {
 	bool success = true;
 	//Load sprite sheet texture
-	if( !Brick.loadFromFile("brick.png", "green" ) )
+	if( !Brick.loadFromFile("Media/brick.png", "green" ) )
 	{
 		cout << "failed to load " << file << endl;
 		success = false;

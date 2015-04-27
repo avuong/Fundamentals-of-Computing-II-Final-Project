@@ -46,8 +46,8 @@ class Goomba : public Enemy {
 
 	private:
 		// Name of the png files for sprite sheets
-		string playerpngLeft = "goomba_left.png";
-		string playerpngRight = "goomba_right.png";
+		string playerpngLeft = "Media/goomba_left.png";
+		string playerpngRight = "Media/goomba_right.png";
 };
 
 #endif
