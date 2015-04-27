@@ -12,7 +12,9 @@
 #include "LTexture.h"
 #include "Map.h"
 #include "Global_Constants.h"
-#include "Football.h"
+//#include "Football.h"
+#include "FootballPlayer.h"
+#include "Goomba.h"
 //#include "Enemy.h"
 
 using namespace std;
@@ -106,7 +108,7 @@ Game::Game()
 		LTexture gMap;
 
 		// Brick Rendering
-		levelPtr = &level_one;
+		levelPtr = &level_two;
 
 		//Pot of Gold Rendering
 		SDL_Rect gGoldLocation;
@@ -377,8 +379,8 @@ void Game::play()
 	int didShamrockCollide = 0;
 	int life_count = 3;
 	int num_players = 4;
-	vector<Football *> map1Players(num_players);
-	vector<Football *> map2Players(num_players);
+	vector<Enemy *> map1Players(num_players);
+	vector<Enemy *> map2Players(num_players);
 	if( !init() )
 	{
 		printf( "Failed to initialize!\n" );
@@ -386,15 +388,15 @@ void Game::play()
 	else
 	{
 		cout << "3\n";
-		Football player1(10,2,1);
-		Football player2(29,8,1);
-		Football player3(25,6,1);
-		Football player4(39,4,1);
+		FootballPlayer player1(10,2,1);
+		FootballPlayer player2(29,8,1);
+		FootballPlayer player3(25,6,1);
+		FootballPlayer player4(39,4,1);
 
-		Football player1a(37,1,2);
-		Football player2a(17,4,2);
-		Football player3a(25,6,2);
-		Football player4a(39,4,2);
+		Goomba player1a(37,1,2);
+		Goomba player2a(17,4,2);
+		Goomba player3a(25,6,2);
+		Goomba player4a(39,4,2);
 
 		map1Players[0] = &player1;
 		map1Players[1] = &player2;

@@ -27,7 +27,7 @@ class Football : public Global_Constants {
 		SDL_Rect gRightEnemy[5];
 		LTexture gLeftEnemyTexture;
 		SDL_Rect gLeftEnemy[5];
-	private:
+	protected:
 		int enemy_xcoord;
 		int enemy_ycoord;
 		Map level1;

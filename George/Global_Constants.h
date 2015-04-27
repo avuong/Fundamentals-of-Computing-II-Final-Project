@@ -4,7 +4,6 @@
 class Global_Constants {
 
 		public:
-		
 			//Screen dimension constants
 			const int SCREEN_WIDTH = 500;
 			const int SCREEN_HEIGHT = 480;
@@ -16,6 +15,10 @@ class Global_Constants {
 			const int LEP_WIDTH = 27;
 			const int FOOTBALL_WIDTH = 49;
 			const int FOOTBALL_HEIGHT = 51;
+			const int FootballPlayer_WIDTH = 49;
+			const int FootballPlayer_HEIGHT = 51;
+			const int Goomba_WIDTH = 35;
+			const int Goomba_HEIGHT = 37;
 			const string gfile1 = "bricks";
 			const string gfile2 = "bricks2";
 
